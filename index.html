@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한 눈에 보는 2026년 정부 예산안</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+        :root {
+            --bg:#f0f4f9; --surface:#fff; --surface2:#f8fafc; --surface3:#f1f5f9;
+            --border:#e2e8f0; --border2:#cbd5e1; --accent:#1d4ed8; --accent2:#2563eb;
+            --accent3:#3b82f6; --accent-light:#eff6ff; --green:#059669; --red:#dc2626;
+            --red-light:#fff5f5; --yellow:#d97706; --purple:#7c3aed; --teal:#0d9488;
+            --pink:#db2777; --text:#0f172a; --text2:#334155; --text3:#64748b;
+            --text4:#94a3b8; --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+            --radius:12px; --font:'Noto Sans KR',sans-serif;
+        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+        header{background:#fff;border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:200;box-shadow:var(--shadow);}
+        .header-inner{max-width:1640px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:62px;}
+        .logo{display:flex;align-items:center;gap:12px;}
+        .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#1d4ed8,#059669);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 2px 8px rgba(29,78,216,.25);}
+        .logo-text{font-size:16px;font-weight:700;color:var(--text);}
+        .logo-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+        .header-stats{display:flex;gap:28px;align-items:center;}
+        .hstat{text-align:right;}
+        .hstat-val{font-size:19px;font-weight:700;color:var(--accent2);}
+        .hstat-label{font-size:10px;color:var(--text3);}
+        .map3d-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;font-family:var(--font);transition:opacity .2s;}
+        .map3d-btn:hover{opacity:.85;}
+        .tab-bar{background:#fff;border-bottom:2px solid var(--border);padding:0 24px;}
+        .tab-bar-inner{max-width:1640px;margin:0 auto;display:flex;gap:0;}
+        .tab-btn{padding:13px 18px;font-size:13px;font-weight:500;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;font-family:var(--font);white-space:nowrap;}
+        .tab-btn:hover{color:var(--accent2);}
+        .tab-btn.active{color:var(--accent2);border-bottom-color:var(--accent2);font-weight:700;}
+        .main-layout{max-width:1640px;margin:0 auto;padding:20px 24px;display:grid;grid-template-columns:268px 1fr;gap:20px;}
+        .sidebar{display:flex;flex-direction:column;gap:12px;}
+        .filter-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);}
+        .filter-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+        .filter-title::before{content:'';display:inline-block;width:3px;height:11px;background:var(--accent2);border-radius:2px;}
+        .search-box{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;font-family:var(--font);}
+        .search-box:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+        .search-box::placeholder{color:var(--text4);}
+        .tag-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+        .tag{padding:4px 9px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);transition:all .15s;white-space:nowrap;font-family:var(--font);}
+        .tag:hover{border-color:var(--accent2);color:var(--accent2);background:var(--accent-light);}
+        .tag.active{background:var(--accent-light);border-color:var(--accent2);color:var(--accent2);font-weight:600;}
+        .tag.all-tag.active{background:var(--accent2);border-color:var(--accent2);color:#fff;}
+        .select-box{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:12px;outline:none;cursor:pointer;margin-top:4px;font-family:var(--font);}
+        .select-box:focus{border-color:var(--accent2);}
+        .reset-btn{width:100%;padding:9px;background:var(--red-light);border:1px solid #fecaca;border-radius:8px;color:var(--red);font-size:12px;cursor:pointer;transition:all .2s;font-family:var(--font);}
+        .reset-btn:hover{background:#fee2e2;}
+        .content{display:flex;flex-direction:column;gap:18px;}
+        .tab-panel{display:none;}
+        .tab-panel.active{display:flex;flex-direction:column;gap:18px;}
+        .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+        .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;box-shadow:var(--shadow);}
+        .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+        .kpi-card.blue::before{background:linear-gradient(90deg,#2563eb,#7c3aed);}
+        .kpi-card.green::before{background:linear-gradient(90deg,#059669,#0d9488);}
+        .kpi-card.yellow::before{background:linear-gradient(90deg,#d97706,#db2777);}
+        .kpi-card.purple::before{background:linear-gradient(90deg,#7c3aed,#db2777);}
+        .kpi-card.teal::before{background:linear-gradient(90deg,#0d9488,#2563eb);}
+        .kpi-card.orange::before{background:linear-gradient(90deg,#ea580c,#d97706);}
+        .kpi-card.red::before{background:linear-gradient(90deg,#dc2626,#ea580c);}
+        .kpi-label{font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:500;}
+        .kpi-value{font-size:24px;font-weight:700;color:var(--text);line-height:1;}
+        .kpi-unit{font-size:12px;font-weight:400;color:var(--text2);margin-left:3px;}
+        .kpi-sub{font-size:11px;color:var(--text3);margin-top:5px;}
+        .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+        .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+        .chart-card.wide{grid-column:1/-1;}
+        .chart-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+        .chart-title-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+        .chart-wrap{position:relative;height:260px;}
+        .chart-wrap.tall{height:360px;}
+        .chart-wrap.h400{height:420px;}
+        .table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+        .table-header{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2);}
+        .table-title{font-size:13px;font-weight:700;color:var(--text);}
+        .table-meta{display:flex;align-items:center;gap:8px;}
+        .badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;}
+        .badge-blue{color:var(--accent2);background:var(--accent-light);border:1px solid #bfdbfe;}
+        .badge-gray{color:var(--text3);background:var(--surface3);border:1px solid var(--border);}
+        .table-wrap{overflow-x:auto;}
+        table{width:100%;border-collapse:collapse;font-size:12px;}
+        th{background:var(--surface3);color:var(--text3);font-weight:700;padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;font-size:11px;}
+        th:hover{color:var(--accent2);background:#f0f7ff;}
+        th.sorted{color:var(--accent2);}
+        th.nosort{cursor:default;}
+        th.nosort:hover{color:var(--text3);background:var(--surface3);}
+        td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle;}
+        tr:last-child td{border-bottom:none;}
+        tr:hover td{background:#f8fbff;}
+        .td-name{color:var(--text);font-weight:500;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        .td-budget{color:var(--accent);font-weight:700;text-align:right;font-variant-numeric:tabular-nums;}
+        .chip{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;white-space:nowrap;font-weight:600;border:1px solid;}
+        .chip-blue{color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;}
+        .expand-btn{background:none;border:none;cursor:pointer;color:var(--text4);font-size:13px;padding:2px 6px;border-radius:4px;transition:all .15s;line-height:1;}
+        .expand-btn:hover{background:var(--accent-light);color:var(--accent2);}
+        .expand-btn.open{color:var(--accent2);transform:rotate(90deg);}
+        .detail-row{display:none;background:#f8fbff;}
+        .detail-row.open{display:table-row;}
+        .detail-row td{padding:0;}
+        .detail-inner{padding:0 14px 10px 50px;border-top:1px dashed #e2e8f0;}
+        .detail-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:11px;}
+        .detail-table th{background:#eef2ff;color:#4338ca;font-weight:600;padding:6px 10px;text-align:left;border-bottom:1px solid #c7d2fe;cursor:default;}
+        .detail-table th:hover{color:#4338ca;background:#eef2ff;}
+        .detail-table td{padding:6px 10px;border-bottom:1px solid #e8edff;color:var(--text2);}
+        .detail-table tr:last-child td{border-bottom:none;}
+        .detail-table tr:hover td{background:#f0f4ff;}
+        .pagination{display:flex;align-items:center;justify-content:center;gap:5px;padding:14px;border-top:1px solid var(--border);background:var(--surface2);}
+        .page-btn{padding:5px 11px;border:1px solid var(--border2);border-radius:7px;background:var(--surface);color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;font-family:var(--font);}
+        .page-btn:hover{border-color:var(--accent2);color:var(--accent2);background:var(--accent-light);}
+        .page-btn.active{background:var(--accent2);border-color:var(--accent2);color:#fff;font-weight:600;}
+        .page-btn:disabled{opacity:.3;cursor:not-allowed;}
+        .field-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+        .field-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden;cursor:pointer;transition:box-shadow .2s,transform .15s;}
+        .field-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.12);transform:translateY(-1px);}
+        .field-num{font-size:10px;font-weight:700;color:var(--text4);letter-spacing:.05em;margin-bottom:6px;}
+        .field-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.3;}
+        .field-budget{font-size:19px;font-weight:700;line-height:1;}
+        .field-unit{font-size:11px;font-weight:400;color:var(--text3);margin-left:2px;}
+        .field-pct{font-size:11px;color:var(--text3);margin-top:4px;}
+        .field-bar{position:absolute;bottom:0;left:0;right:0;height:3px;}
+        #loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:14px;}
+        .spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:spin .8s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+        .loading-text{color:var(--text3);font-size:14px;}
+        .treemap-container{width:100%;height:420px;position:relative;border-radius:10px;overflow:hidden;background:var(--surface2);}
+        .treemap-cell{position:absolute;display:flex;flex-direction:column;justify-content:flex-end;padding:10px 12px;cursor:default;transition:filter .15s;overflow:hidden;border:2px solid #fff;border-radius:6px;box-sizing:border-box;}
+        .treemap-cell:hover{filter:brightness(.93);z-index:10;}
+        .treemap-cell-name{font-size:13px;font-weight:700;color:#fff;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,.3);}
+        .treemap-cell-val{font-size:12px;font-weight:600;color:rgba(255,255,255,.9);margin-top:4px;text-shadow:0 1px 2px rgba(0,0,0,.3);}
+        .treemap-cell-pct{font-size:11px;color:rgba(255,255,255,.75);margin-top:1px;}
+        .treemap-cell.small .treemap-cell-name{font-size:11px;}
+        .treemap-cell.small .treemap-cell-val{font-size:10px;}
+        .treemap-cell.tiny .treemap-cell-name{font-size:10px;}
+        .treemap-cell.tiny .treemap-cell-val,.treemap-cell.tiny .treemap-cell-pct{display:none;}
+        .section-divider{font-size:14px;font-weight:700;color:var(--text2);padding:10px 0 4px;border-bottom:2px solid var(--border);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+        @media(max-width:1200px){
+            .main-layout{grid-template-columns:1fr;}
+            .sidebar{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+            .kpi-row,.field-grid{grid-template-columns:repeat(2,1fr);}
+            .charts-grid{grid-template-columns:1fr;}
+            .treemap-container{height:320px;}
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" style="display:flex">
+        <div class="spinner"></div>
+        <div class="loading-text">데이터 로딩 중...</div>
+    </div>
+
+    <header>
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-icon">🏛</div>
+                <div>
+                    <div class="logo-text">한 눈에 보는 2026년 정부 예산안</div>
+                    <div class="logo-sub">2026년 세입세출예산 세부사업 현황 · 기획재정부</div>
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="hstat">
+                    <div class="hstat-val" id="h-budget">-</div>
+                    <div class="hstat-label">총 예산 (조원)</div>
+                </div>
+                <div class="hstat">
+                    <div class="hstat-val" id="h-proj">-</div>
+                    <div class="hstat-label">단위사업</div>
+                </div>
+                <div class="hstat">
+                    <div class="hstat-val" id="h-min">-</div>
+                    <div class="hstat-label">소관부처</div>
+                </div>
+                <a href="map3d.html" class="map3d-btn">🗺 3D 예산 지도</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="tab-bar">
+        <div class="tab-bar-inner">
+            <button class="tab-btn active" onclick="switchTab('field')">📊 분야별 현황</button>
+            <button class="tab-btn" onclick="switchTab('ministry')">🏛 부처별 현황</button>
+            <button class="tab-btn" onclick="switchTab('list')">📄 세부사업 목록</button>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <aside class="sidebar">
+            <div class="filter-card">
+                <div class="filter-title">검색</div>
+                <input type="text" id="search-box" class="search-box" placeholder="사업명·부처명 검색..."
+                       onkeyup="filters.search=this.value; applyFilters();">
+            </div>
+            <div class="filter-card">
+                <div class="filter-title">분야</div>
+                <div class="tag-list" id="field-tags"></div>
+            </div>
+            <div class="filter-card">
+                <div class="filter-title">부처</div>
+                <select class="select-box" id="ministry-select">
+                    <option value="">전체 부처</option>
+                </select>
+            </div>
+            <div class="filter-card">
+                <div class="filter-title">회계 구분</div>
+                <select class="select-box" id="account-select">
+                    <option value="">전체 회계</option>
+                    <option value="일반회계">일반회계</option>
+                    <option value="특별회계">특별회계</option>
+                </select>
+            </div>
+            <button class="reset-btn" onclick="resetFilters()">⟳ 필터 초기화</button>
+        </aside>
+
+        <div class="content">
+            <!-- TAB: 분야별 현황 -->
+            <div id="panel-field" class="tab-panel active">
+                <div class="section-divider">분야별 예산 현황 (백만원)</div>
+                <div id="field-cards" class="field-grid"></div>
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <span class="chart-title-dot" style="background:#2563eb"></span>
+                        분야별 예산 트리맵 · 박스 크기 ∝ 예산 규모
+                    </div>
+                    <div id="field-treemap" class="treemap-container"></div>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-title">
+                            <span class="chart-title-dot" style="background:#2563eb"></span>
+                            분야별 예산 규모
+                        </div>
+                        <div class="chart-wrap tall">
+                            <canvas id="field-bar-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">
+                            <span class="chart-title-dot" style="background:#7c3aed"></span>
+                            분야별 × 부처 (상위 15개 부처)
+                        </div>
+                        <div class="chart-wrap tall">
+                            <canvas id="field-min-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-title">분야별 상세</div>
+                        <div class="table-meta"><span class="badge badge-blue" id="field-table-count"></span></div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:30px" class="nosort">#</th>
+                                    <th>분야명</th>
+                                    <th style="text-align:right">예산 (백만원)</th>
+                                    <th style="width:130px">비율</th>
+                                    <th style="width:70px">사업수</th>
+                                </tr>
+                            </thead>
+                            <tbody id="field-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: 부처별 현황 -->
+            <div id="panel-ministry" class="tab-panel">
+                <div class="section-divider">부처별 예산 현황</div>
+                <div class="kpi-row">
+                    <div class="kpi-card blue">
+                        <div class="kpi-label">총 예산</div>
+                        <div class="kpi-value" id="min-k-budget">-</div>
+                        <div class="kpi-sub">백만원</div>
+                    </div>
+                    <div class="kpi-card green">
+                        <div class="kpi-label">참여 부처</div>
+                        <div class="kpi-value" id="min-k-count">-</div>
+                        <div class="kpi-sub">개 기관</div>
+                    </div>
+                    <div class="kpi-card yellow">
+                        <div class="kpi-label">단위사업 수</div>
+                        <div class="kpi-value" id="min-k-proj">-</div>
+                        <div class="kpi-sub">개 사업</div>
+                    </div>
+                    <div class="kpi-card purple">
+                        <div class="kpi-label">부처당 평균 예산</div>
+                        <div class="kpi-value" id="min-k-avg">-</div>
+                        <div class="kpi-sub">백만원</div>
+                    </div>
+                </div>
+                <div class="chart-card wide">
+                    <div class="chart-title">
+                        <span class="chart-title-dot" style="background:#2563eb"></span>
+                        부처별 예산 규모 (상위 30개)
+                    </div>
+                    <div class="chart-wrap h400">
+                        <canvas id="min-full-chart"></canvas>
+                    </div>
+                </div>
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-title">부처별 상세 현황</div>
+                        <div class="table-meta"><span class="badge badge-blue" id="min-table-count"></span></div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:40px" class="nosort">순위</th>
+                                    <th>부처명</th>
+                                    <th>단위사업</th>
+                                    <th style="text-align:right">총 예산 (백만원)</th>
+                                    <th style="width:130px">점유율</th>
+                                    <th style="width:120px">주요 분야</th>
+                                </tr>
+                            </thead>
+                            <tbody id="min-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: 세부사업 목록 -->
+            <div id="panel-list" class="tab-panel">
+                <div class="section-divider">세부사업 목록</div>
+                <div class="kpi-row">
+                    <div class="kpi-card blue">
+                        <div class="kpi-label">단위사업 수</div>
+                        <div class="kpi-value" id="list-k-sub">-</div>
+                        <div class="kpi-sub" id="list-k-sub-pct">-</div>
+                    </div>
+                    <div class="kpi-card green">
+                        <div class="kpi-label">예산 합계</div>
+                        <div class="kpi-value" id="list-k-budget">-</div>
+                        <div class="kpi-sub" id="list-k-budget-pct">-</div>
+                    </div>
+                    <div class="kpi-card yellow">
+                        <div class="kpi-label">평균 예산</div>
+                        <div class="kpi-value" id="list-k-avg">-</div>
+                        <div class="kpi-sub">백만원</div>
+                    </div>
+                    <div class="kpi-card purple">
+                        <div class="kpi-label">최대 사업 예산</div>
+                        <div class="kpi-value" id="list-k-max">-</div>
+                        <div class="kpi-sub" id="list-k-max-name">-</div>
+                    </div>
+                </div>
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="table-title">단위사업 목록</div>
+                        <div class="table-meta"><span class="badge badge-blue" id="list-table-count"></span></div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:30px" class="nosort"></th>
+                                    <th onclick="listSortBy('name')" id="lt-name">단위사업명</th>
+                                    <th style="width:90px" onclick="listSortBy('ministry')" id="lt-ministry">부처</th>
+                                    <th style="width:110px" onclick="listSortBy('field')" id="lt-field">분야</th>
+                                    <th style="width:130px" onclick="listSortBy('subfield')" id="lt-subfield">부문</th>
+                                    <th style="text-align:right;width:120px" onclick="listSortBy('budget')" id="lt-budget">예산(백만원) ▼</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-table-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="list-pagination"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ══════════════════════════════
+    // 상수
+    // ══════════════════════════════
+    const FIELD_COLORS = {
+        '일반·지방행정':'#4f46e5','공공질서및안전':'#dc2626','통일·외교':'#0891b2',
+        '국방':'#374151','교육':'#2563eb','문화및관광':'#db2777','환경':'#059669',
+        '사회복지':'#7c3aed','보건':'#ea580c','농림수산':'#65a30d',
+        '산업·중소기업및에너지':'#d97706','교통및물류':'#0d9488','통신':'#9333ea',
+        '국토및지역개발':'#1d4ed8','과학기술':'#10b981','예비비':'#6b7280'
+    };
+    const FIELD_NAMES = Object.keys(FIELD_COLORS);
+    const KPI_CLASSES = ['blue','green','yellow','purple','teal','orange','red','blue','green','yellow','purple','teal','orange','red','blue','green'];
+
+    // ══════════════════════════════
+    // 상태
+    // ══════════════════════════════
+    let allData = [], filtered = [];
+    let currentTab = 'field';
+    let listPage = 1;
+    const LIST_PAGE = 20;
+    let listSortKey = 'budget', listSortDir = -1;
+    let charts = {};
+    let filters = { search:'', field:'', ministry:'', account:'' };
+    let expandedRows = new Set();
+
+    // ══════════════════════════════
+    // 데이터 로드
+    // ══════════════════════════════
+    async function loadData() {
+        const res = await fetch('data.json');
+        allData = await res.json();
+        initUI();
+    }
+
+    function initUI() {
+        buildSidebar();
+        applyFilters();
+        document.getElementById('loading').style.display = 'none';
+        const tb = allData.reduce((s,r) => s + r.budget, 0);
+        document.getElementById('h-budget').textContent = (tb / 1000000).toFixed(1);
+        document.getElementById('h-proj').textContent = allData.length.toLocaleString();
+        document.getElementById('h-min').textContent = new Set(allData.map(r => r.ministry)).size;
+    }
+
+    // ══════════════════════════════
+    // 탭
+    // ══════════════════════════════
+    const TAB_IDS = ['field','ministry','list'];
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', TAB_IDS[i] === tab));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + tab).classList.add('active');
+        renderCurrentTab();
+    }
+
+    // ══════════════════════════════
+    // 사이드바
+    // ══════════════════════════════
+    function buildSidebar() {
+        const ft = document.getElementById('field-tags');
+        ft.innerHTML = `<button class="tag all-tag active" onclick="setFilter('field','')">전체</button>`;
+        FIELD_NAMES.forEach(f => {
+            const c = FIELD_COLORS[f];
+            ft.innerHTML += `<button class="tag" style="--tc:${c}" onclick="setFilter('field','${f}')">${f}</button>`;
+        });
+
+        const mins = [...new Set(allData.map(r => r.ministry))].sort();
+        const ms = document.getElementById('ministry-select');
+        mins.forEach(m => ms.innerHTML += `<option value="${m}">${m}</option>`);
+        ms.addEventListener('change', e => setFilter('ministry', e.target.value));
+
+        document.getElementById('account-select').addEventListener('change', e => setFilter('account', e.target.value));
+    }
+
+    function setFilter(key, val) {
+        filters[key] = val;
+        if (key === 'field') {
+            document.querySelectorAll('#field-tags .tag').forEach(t => {
+                const isAll = t.classList.contains('all-tag');
+                t.classList.toggle('active', isAll ? val === '' : t.textContent === val);
+            });
+        }
+        listPage = 1;
+        applyFilters();
+    }
+
+    function resetFilters() {
+        filters = { search:'', field:'', ministry:'', account:'' };
+        document.getElementById('search-box').value = '';
+        document.getElementById('ministry-select').value = '';
+        document.getElementById('account-select').value = '';
+        document.querySelectorAll('.tag').forEach(t => t.classList.toggle('active', t.classList.contains('all-tag')));
+        listPage = 1;
+        applyFilters();
+    }
+
+    // ══════════════════════════════
+    // 필터
+    // ══════════════════════════════
+    function applyFilters() {
+        const q = filters.search.toLowerCase();
+        filtered = allData.filter(r => {
+            if (filters.field && r.field !== filters.field) return false;
+            if (filters.ministry && r.ministry !== filters.ministry) return false;
+            if (filters.account) {
+                if (filters.account === '일반회계' && r.main_account !== '일반회계') return false;
+                if (filters.account === '특별회계' && r.main_account === '일반회계') return false;
+            }
+            if (q) {
+                const s = (r.name + r.ministry + r.field + r.subfield + r.program).toLowerCase();
+                if (!s.includes(q)) return false;
+            }
+            return true;
+        });
+        renderCurrentTab();
+    }
+
+    function renderCurrentTab() {
+        switch(currentTab) {
+            case 'field': renderField(); break;
+            case 'ministry': renderMinistry(); break;
+            case 'list': renderList(); break;
+        }
+    }
+
+    // ══════════════════════════════
+    // 유틸
+    // ══════════════════════════════
+    function fmtBudget(v) {
+        if (v >= 1000000) return (v/1000000).toFixed(2)+'조원';
+        if (v >= 100000) return (v/100000).toFixed(1)+'천억원';
+        if (v >= 10000) return (v/100).toFixed(0)+'억원';
+        if (v >= 100) return (v/100).toFixed(1)+'억원';
+        return Math.round(v).toLocaleString()+'백만원';
+    }
+    function fmtM(v) { return Math.round(v).toLocaleString(); }
+    function pct(a,b) { return b ? ((a/b)*100).toFixed(1)+'%' : '0%'; }
+
+    function mkChart(id, cfg) {
+        if (charts[id]) charts[id].destroy();
+        const ctx = document.getElementById(id)?.getContext('2d');
+        if (!ctx) return;
+        charts[id] = new Chart(ctx, cfg);
+    }
+    const GRID = { color:'#e2e8f0' };
+    const TC = '#94a3b8';
+    function barY(v) {
+        if (v===0) return '0';
+        if (v>=1000000) return (v/1000000).toFixed(1)+'조';
+        if (v>=100000) return (v/100000).toFixed(1)+'천억';
+        if (v>=10000) return (v/10000).toFixed(0)+'백억';
+        if (v>=100) return (v/100).toFixed(0)+'억';
+        return v+'백만';
+    }
+
+    // ══════════════════════════════
+    // 트리맵
+    // ══════════════════════════════
+    function renderTreemap(containerId, items, total) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+        const W = container.offsetWidth || 800;
+        const H = container.offsetHeight || 420;
+        const sorted = [...items].sort((a,b) => b.budget - a.budget);
+        const totalBud = sorted.reduce((s,r) => s + r.budget, 0);
+        const rects = squarify(sorted.map(d => ({...d, area:(d.budget/totalBud)*W*H})), 0, 0, W, H);
+        rects.forEach((r,i) => {
+            const cell = document.createElement('div');
+            cell.className = 'treemap-cell';
+            const w=r.w, h=r.h;
+            const sizeClass = w<120||h<80 ? 'tiny' : w<180||h<100 ? 'small' : '';
+            if (sizeClass) cell.classList.add(sizeClass);
+            cell.style.cssText = `left:${r.x}px;top:${r.y}px;width:${w}px;height:${h}px;background:linear-gradient(135deg,${r.color}dd,${r.color}99)`;
+            cell.title = `${r.label}: ${fmtM(r.budget)} 백만원 (${pct(r.budget,total)})`;
+            cell.innerHTML = `
+                <div class="treemap-cell-name">${r.label}</div>
+                <div class="treemap-cell-val">${fmtBudget(r.budget)}</div>
+                <div class="treemap-cell-pct">${pct(r.budget,total)}</div>`;
+            container.appendChild(cell);
+        });
+    }
+
+    function squarify(items, x, y, w, h) {
+        if (!items.length) return [];
+        if (items.length===1) return [{...items[0], x, y, w, h}];
+        const shortSide = Math.min(w,h);
+        const horizontal = w>=h;
+        let rowItems=[], best=Infinity;
+        for (let i=0; i<items.length; i++) {
+            rowItems.push(items[i]);
+            const rowArea = rowItems.reduce((s,r)=>s+r.area,0);
+            const rowLen = rowArea/shortSide;
+            const worst = Math.max(...rowItems.map(r=>{
+                const rw=horizontal?rowLen:r.area/rowLen;
+                const rh=horizontal?r.area/rowLen:rowLen;
+                return Math.max(rw/rh,rh/rw);
+            }));
+            if (worst>best) { rowItems.pop(); break; }
+            best=worst;
+        }
+        const rowArea=rowItems.reduce((s,r)=>s+r.area,0);
+        const rowLen=rowArea/shortSide;
+        const result=[];
+        let pos=horizontal?y:x;
+        rowItems.forEach(item=>{
+            const span=item.area/rowLen;
+            if (horizontal) { result.push({...item, x, y:pos, w:rowLen, h:span}); pos+=span; }
+            else { result.push({...item, x:pos, y, w:span, h:rowLen}); pos+=span; }
+        });
+        const rest=items.slice(rowItems.length);
+        if (rest.length) {
+            const nx=horizontal?x+rowLen:x, ny=horizontal?y:y+rowLen;
+            const nw=horizontal?w-rowLen:w, nh=horizontal?h:h-rowLen;
+            result.push(...squarify(rest,nx,ny,nw,nh));
+        }
+        return result;
+    }
+
+    // ══════════════════════════════
+    // ① 분야별 현황
+    // ══════════════════════════════
+    function renderField() {
+        const total = filtered.reduce((s,r) => s+r.budget, 0);
+        const fieldData = FIELD_NAMES.map(fname => {
+            const items = filtered.filter(r => r.field === fname);
+            return {
+                label: fname,
+                color: FIELD_COLORS[fname],
+                budget: items.reduce((s,r) => s+r.budget, 0),
+                count: items.length
+            };
+        }).filter(d => d.budget > 0);
+
+        // Field cards
+        document.getElementById('field-cards').innerHTML = fieldData.map((c,i) => `
+            <div class="field-card" style="border-color:${c.color}33">
+                <div class="field-num">${String(i+1).padStart(2,'0')}</div>
+                <div class="field-name">${c.label}</div>
+                <div class="field-budget" style="color:${c.color}">${fmtBudget(c.budget)}<span class="field-unit">원</span></div>
+                <div class="field-pct">${fmtM(c.budget)} 백만원 · ${pct(c.budget,total)}</div>
+                <div class="field-bar" style="background:linear-gradient(90deg,${c.color},${c.color}66)"></div>
+            </div>`).join('');
+
+        // Treemap
+        renderTreemap('field-treemap', fieldData, total);
+
+        // Bar chart (horizontal)
+        const sorted = [...fieldData].sort((a,b) => b.budget-a.budget);
+        mkChart('field-bar-chart', {
+            type:'bar',
+            data:{
+                labels: sorted.map(c=>c.label),
+                datasets:[{
+                    data: sorted.map(c=>c.budget),
+                    backgroundColor: sorted.map(c=>c.color+'44'),
+                    borderColor: sorted.map(c=>c.color),
+                    borderWidth:1.5, borderRadius:4
+                }]
+            },
+            options:{
+                indexAxis:'y', responsive:true, maintainAspectRatio:false,
+                plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>fmtBudget(c.raw)}} },
+                scales:{
+                    x:{ticks:{color:TC,font:{size:10},callback:barY},grid:GRID},
+                    y:{ticks:{color:'#334155',font:{size:11}},grid:GRID}
+                }
+            }
+        });
+
+        // Stacked bar: field × top ministries
+        const mMap = {};
+        filtered.forEach(r => { mMap[r.ministry]=(mMap[r.ministry]||0)+r.budget; });
+        const top15Min = Object.entries(mMap).sort((a,b)=>b[1]-a[1]).slice(0,15).map(e=>e[0]);
+        mkChart('field-min-chart', {
+            type:'bar',
+            data:{
+                labels:top15Min,
+                datasets: fieldData.map(c=>({
+                    label:c.label,
+                    data:top15Min.map(m=>filtered.filter(r=>r.ministry===m&&r.field===c.label).reduce((s,r)=>s+r.budget,0)),
+                    backgroundColor:c.color+'99',
+                    borderColor:c.color,
+                    borderWidth:1
+                }))
+            },
+            options:{
+                indexAxis:'y', responsive:true, maintainAspectRatio:false,
+                plugins:{ legend:{display:false} },
+                scales:{
+                    x:{stacked:true,ticks:{color:TC,font:{size:10},callback:barY},grid:GRID},
+                    y:{stacked:true,ticks:{color:'#334155',font:{size:10}},grid:GRID}
+                }
+            }
+        });
+
+        // Table
+        document.getElementById('field-table-count').textContent = `${fieldData.length}개 분야`;
+        document.getElementById('field-table-body').innerHTML = fieldData.map((c,i) => `<tr>
+            <td style="font-weight:700;color:${c.color};font-size:13px">${String(i+1).padStart(2,'0')}</td>
+            <td><span class="chip" style="background:${c.color}18;color:${c.color};border-color:${c.color}44">${c.label}</span></td>
+            <td style="text-align:right;font-weight:700;color:var(--accent)">${fmtM(c.budget)}</td>
+            <td>
+                <div style="display:flex;align-items:center;gap:6px">
+                    <div style="width:80px;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden">
+                        <div style="height:100%;width:${total?c.budget/total*100:0}%;background:${c.color};border-radius:3px"></div>
+                    </div>
+                    <span style="font-weight:600;color:${c.color};min-width:36px">${pct(c.budget,total)}</span>
+                </div>
+            </td>
+            <td style="font-size:11px;color:var(--text3)">${c.count.toLocaleString()}개</td>
+        </tr>`).join('');
+    }
+
+    // ══════════════════════════════
+    // ② 부처별 현황
+    // ══════════════════════════════
+    function renderMinistry() {
+        const total = filtered.reduce((s,r) => s+r.budget, 0);
+        const mMap = {};
+        filtered.forEach(r => {
+            if (!mMap[r.ministry]) mMap[r.ministry] = { budget:0, count:0, fields:{} };
+            mMap[r.ministry].budget += r.budget;
+            mMap[r.ministry].count++;
+            mMap[r.ministry].fields[r.field] = (mMap[r.ministry].fields[r.field]||0) + r.budget;
+        });
+        const minList = Object.entries(mMap).map(([name, d]) => ({name, ...d}))
+            .sort((a,b) => b.budget-a.budget);
+        const mc = minList.length;
+
+        document.getElementById('min-k-budget').textContent = fmtBudget(total);
+        document.getElementById('min-k-count').textContent = mc.toLocaleString();
+        document.getElementById('min-k-proj').textContent = filtered.length.toLocaleString();
+        document.getElementById('min-k-avg').textContent = mc ? fmtBudget(total/mc) : '-';
+        document.getElementById('min-table-count').textContent = `${mc}개 부처`;
+
+        const top30 = minList.slice(0,30);
+        const colors = top30.map((_,i) => {
+            const h = (i*360/30)|0;
+            return `hsl(${h},60%,50%)`;
+        });
+        mkChart('min-full-chart', {
+            type:'bar',
+            data:{
+                labels:top30.map(m=>m.name),
+                datasets:[{
+                    data:top30.map(m=>m.budget),
+                    backgroundColor:colors.map(c=>c.replace('50%','50%').replace('hsl','hsla').replace(')',',0.4)')),
+                    borderColor:colors,
+                    borderWidth:1.5, borderRadius:4
+                }]
+            },
+            options:{
+                indexAxis:'y', responsive:true, maintainAspectRatio:false,
+                plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>fmtBudget(c.raw)}} },
+                scales:{
+                    x:{ticks:{color:TC,font:{size:10},callback:barY},grid:GRID},
+                    y:{ticks:{color:'#334155',font:{size:10}},grid:GRID}
+                }
+            }
+        });
+
+        document.getElementById('min-table-body').innerHTML = minList.map((m,i) => {
+            const topField = Object.entries(m.fields).sort((a,b)=>b[1]-a[1])[0];
+            const tc = topField ? FIELD_COLORS[topField[0]] : '#6b7280';
+            return `<tr>
+                <td style="font-weight:700;color:var(--text3);font-size:12px">${i+1}</td>
+                <td class="td-name" style="max-width:180px">${m.name}</td>
+                <td style="text-align:center;color:var(--text3)">${m.count.toLocaleString()}개</td>
+                <td style="text-align:right;font-weight:700;color:var(--accent)">${fmtM(m.budget)}</td>
+                <td>
+                    <div style="display:flex;align-items:center;gap:6px">
+                        <div style="width:70px;height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden">
+                            <div style="height:100%;width:${total?m.budget/total*100:0}%;background:var(--accent2);border-radius:3px"></div>
+                        </div>
+                        <span style="font-size:11px;color:var(--text3)">${pct(m.budget,total)}</span>
+                    </div>
+                </td>
+                <td>${topField ? `<span class="chip" style="background:${tc}18;color:${tc};border-color:${tc}44;font-size:10px">${topField[0]}</span>` : ''}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ══════════════════════════════
+    // ③ 세부사업 목록
+    // ══════════════════════════════
+    function listSortBy(key) {
+        if (listSortKey === key) { listSortDir *= -1; }
+        else { listSortKey = key; listSortDir = key==='budget' ? -1 : 1; }
+        ['name','ministry','field','subfield','budget'].forEach(k => {
+            const el = document.getElementById('lt-'+k);
+            if (el) el.textContent = el.textContent.replace(/[▲▼]/g,'').trim() + (k===key?(listSortDir>0?' ▲':' ▼'):'');
+        });
+        listPage = 1;
+        renderList();
+    }
+
+    function renderList() {
+        const total = allData.reduce((s,r) => s+r.budget, 0);
+        const tb = filtered.reduce((s,r) => s+r.budget, 0);
+        const sorted = [...filtered].sort((a,b) => {
+            const av = a[listSortKey]||0, bv = b[listSortKey]||0;
+            if (typeof av === 'string') return listSortDir * av.localeCompare(bv);
+            return listSortDir * (bv - av);
+        });
+
+        document.getElementById('list-k-sub').textContent = filtered.length.toLocaleString();
+        document.getElementById('list-k-sub-pct').textContent = `전체의 ${pct(filtered.length,allData.length)}`;
+        document.getElementById('list-k-budget').textContent = fmtBudget(tb);
+        document.getElementById('list-k-budget-pct').textContent = `전체의 ${pct(tb,total)}`;
+        document.getElementById('list-k-avg').textContent = filtered.length ? fmtBudget(tb/filtered.length) : '-';
+        const maxItem = sorted[0];
+        document.getElementById('list-k-max').textContent = maxItem ? fmtBudget(maxItem.budget) : '-';
+        document.getElementById('list-k-max-name').textContent = maxItem ? maxItem.name.slice(0,15)+'...' : '-';
+
+        const pages = Math.ceil(sorted.length / LIST_PAGE);
+        if (listPage > pages) listPage = Math.max(1, pages);
+        const pageItems = sorted.slice((listPage-1)*LIST_PAGE, listPage*LIST_PAGE);
+
+        document.getElementById('list-table-count').textContent = `${filtered.length.toLocaleString()}개 사업`;
+
+        document.getElementById('list-table-body').innerHTML = pageItems.map(r => {
+            const fc = FIELD_COLORS[r.field] || '#6b7280';
+            const rowId = 'row-' + r.id;
+            const detHtml = r.details.length ? r.details.map(d =>
+                `<tr><td class="td-name" style="max-width:300px;padding-left:8px">${d.name}</td><td style="text-align:right;font-weight:600;color:var(--accent)">${fmtM(d.budget)}</td><td style="color:var(--text3);font-size:10px">${d.account||''}</td></tr>`
+            ).join('') : '';
+            return `
+            <tr>
+                <td style="text-align:center">${r.details.length > 1 ? `<button class="expand-btn" id="ebtn-${r.id}" onclick="toggleRow(${r.id})">▶</button>` : ''}</td>
+                <td class="td-name">${r.name}</td>
+                <td style="font-size:11px;color:var(--text3);white-space:nowrap">${r.ministry}</td>
+                <td><span class="chip" style="background:${fc}18;color:${fc};border-color:${fc}44;font-size:10px">${r.field}</span></td>
+                <td style="font-size:11px;color:var(--text3)">${r.subfield}</td>
+                <td class="td-budget">${fmtM(r.budget)}</td>
+            </tr>
+            ${r.details.length > 1 ? `<tr class="detail-row ${expandedRows.has(r.id)?'open':''}" id="${rowId}">
+                <td colspan="6">
+                    <div class="detail-inner">
+                        <table class="detail-table">
+                            <thead><tr><th>세부사업명</th><th style="text-align:right">예산(백만원)</th><th>회계</th></tr></thead>
+                            <tbody>${detHtml}</tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>` : ''}`;
+        }).join('');
+
+        // Pagination
+        const pg = document.getElementById('list-pagination');
+        pg.innerHTML = '';
+        if (pages <= 1) return;
+        const addBtn = (lbl, page, disabled=false, active=false) => {
+            const b = document.createElement('button');
+            b.className = 'page-btn' + (active?' active':'');
+            b.textContent = lbl;
+            b.disabled = disabled;
+            b.onclick = () => { listPage=page; renderList(); };
+            pg.appendChild(b);
+        };
+        addBtn('«', 1, listPage===1);
+        addBtn('‹', listPage-1, listPage===1);
+        const start = Math.max(1, listPage-2);
+        const end = Math.min(pages, start+4);
+        for (let i=start; i<=end; i++) addBtn(i, i, false, i===listPage);
+        addBtn('›', listPage+1, listPage===pages);
+        addBtn('»', pages, listPage===pages);
+    }
+
+    function toggleRow(id) {
+        if (expandedRows.has(id)) expandedRows.delete(id);
+        else expandedRows.add(id);
+        const row = document.getElementById('row-'+id);
+        const btn = document.getElementById('ebtn-'+id);
+        if (row) row.classList.toggle('open', expandedRows.has(id));
+        if (btn) btn.classList.toggle('open', expandedRows.has(id));
+    }
+
+    loadData();
+    </script>
+</body>
+</html>
