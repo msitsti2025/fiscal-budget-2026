@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 정부 예산 3D 지도</title>
-    <meta property="og:title" content="2026년 정부예산안 3D 지도">
+    <title>2026 정부 예산 3D 예산도시</title>
+    <meta property="og:title" content="2026년 정부예산안 3D 예산도시">
     <meta property="og:description" content="2026년 정부예산안 624.8조원, 61개 부처 2,275개 세부사업을 3D 빌딩으로 시각화한 인터랙티브 지도">
-    <meta property="og:image" content="https://danue1.github.io/fiscal-budget-2026/og-image.png">
-    <meta property="og:url" content="https://danue1.github.io/fiscal-budget-2026/map3d.html">
+    <meta property="og:image" content="https://msitsti2025.github.io/fiscal-budget-2026/og-image.png">
+    <meta property="og:url" content="https://msitsti2025.github.io/fiscal-budget-2026/map3d.html">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="2026년 정부예산안 3D 지도">
+    <meta name="twitter:title" content="2026년 정부예산안 3D 예산도시">
     <meta name="twitter:description" content="2026년 정부예산안 624.8조원, 61개 부처 2,275개 세부사업을 3D 빌딩으로 시각화">
-    <meta name="twitter:image" content="https://danue1.github.io/fiscal-budget-2026/og-image.png">
+    <meta name="twitter:image" content="https://msitsti2025.github.io/fiscal-budget-2026/og-image.png">
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
@@ -83,22 +83,22 @@
 <body>
     <div id="loading">
         <div class="ld-spinner"></div>
-        <div class="ld-text">3D 지도 로딩 중...</div>
+        <div class="ld-text">3D 예산도시 구성 중...</div>
     </div>
 
     <div id="canvas-container"></div>
 
     <div id="header">
         <div class="logo">
-            <div class="logo-icon">🗺</div>
+            <div class="logo-icon">🏙</div>
             <div>
-                <div class="logo-text">2026년 정부 예산 3D 지도</div>
-                <div class="logo-sub">건물높이 ∝ log(예산) · 각 층 = 세부사업 · 색상 = 분야</div>
+                <div class="logo-text">2026년 정부 예산 3D 예산도시</div>
+                <div class="logo-sub">바닥 = 분야별 트리맵 · 건물 = 단위사업 · 층 = 세부사업 · 높이 = log(예산)</div>
             </div>
         </div>
         <div class="hstats">
             <div class="hstat"><div class="hstat-val" id="h-budget">-</div><div class="hstat-label">총예산 (조원)</div></div>
-            <div class="hstat"><div class="hstat-val" id="h-field">16</div><div class="hstat-label">분야</div></div>
+            <div class="hstat"><div class="hstat-val" id="h-field">-</div><div class="hstat-label">분야</div></div>
             <div class="hstat"><div class="hstat-val" id="h-bldg">-</div><div class="hstat-label">단위사업</div></div>
             <div class="hstat"><div class="hstat-val" id="h-sub">-</div><div class="hstat-label">세부사업</div></div>
             <a href="index.html" class="back-btn">← 대시보드</a>
@@ -114,7 +114,7 @@
         <h3>표시 옵션</h3>
         <div class="ctrl-row">
             <button class="ctrl-btn active" id="btn-labels" onclick="toggleLabels()">라벨</button>
-            <button class="ctrl-btn active" id="btn-rings" onclick="toggleRings()">구역</button>
+            <button class="ctrl-btn active" id="btn-floors" onclick="toggleFloors()">바닥</button>
         </div>
         <div class="ctrl-row">
             <button class="ctrl-btn" onclick="resetCamera()">카메라 초기화</button>
@@ -143,6 +143,9 @@
     // ══════════════════════════════
     // 상수
     // ══════════════════════════════
+    const GROUND_SIZE = 3200;
+    const GROUND_HALF = GROUND_SIZE / 2;
+
     const FIELD_COLORS_INT = {
         '일반·지방행정':0x4f46e5,'공공질서및안전':0xdc2626,'통일·외교':0x0891b2,
         '국방':0x4b5563,'교육':0x2563eb,'문화및관광':0xdb2777,'환경':0x059669,
@@ -157,7 +160,6 @@
         '산업·중소기업및에너지':'#d97706','교통및물류':'#0d9488','통신':'#9333ea',
         '국토및지역개발':'#1d4ed8','과학기술':'#10b981','예비비':'#6b7280'
     };
-    // 세부사업 층별 색상 팔레트
     const FLOOR_PALETTE_INT = [
         0x3b82f6,0xf59e0b,0x10b981,0xef4444,0xa855f7,
         0xf97316,0x06b6d4,0xec4899,0x84cc16,0x6366f1,
@@ -175,29 +177,127 @@
     // 상태
     // ══════════════════════════════
     let scene, camera, renderer, raycaster, mouse;
-    let buildingMeshGroups = []; // [{data, meshes:[]}]
-    let rings = [], labelSprites = [];
-    let showLabels = true, showRings = true;
-    let mapData = null;
+    let buildingMeshGroups = [];
+    let fieldFloorMeshes = [], labelSprites = [];
+    let showLabels = true, showFloors = true;
+    let mapData = null, fieldLayouts = [];
     let hiddenFields = new Set();
-
     let isDragging = false, isRightDragging = false;
-    let lastMouse = {x:0,y:0};
-    let spherical = {theta:Math.PI/6, phi:Math.PI/3, radius:1800};
+    let lastMouse = {x:0, y:0};
+    let spherical = {theta: Math.PI/5, phi: Math.PI/3.2, radius: 4500};
     let target = {x:0, y:0, z:0};
-    let selectedGroup = null;
 
     function fmtBudget(v) {
-        if (v>=1000000) return (v/1000000).toFixed(2)+'조원';
-        if (v>=100000) return (v/100000).toFixed(1)+'천억원';
-        if (v>=10000) return (v/100).toFixed(0)+'억원';
-        if (v>=100) return (v/100).toFixed(1)+'억원';
-        return Math.round(v).toLocaleString()+'백만원';
+        if (v >= 1000000) return (v/1000000).toFixed(2) + '조원';
+        if (v >= 100000)  return (v/100000).toFixed(1) + '천억원';
+        if (v >= 10000)   return (v/100).toFixed(0) + '억원';
+        if (v >= 100)     return (v/100).toFixed(1) + '억원';
+        return Math.round(v).toLocaleString() + '백만원';
     }
 
-    // 건물 전체 높이: 로그 스케일 (단위: 백만원)
     function calcHeight(bud) {
         return Math.max(6, Math.log(1 + bud / 300) * 28);
+    }
+
+    // ══════════════════════════════
+    // Squarified Treemap 알고리즘
+    // ══════════════════════════════
+    function tmWorst(areas, short) {
+        if (!areas.length || short <= 0) return Infinity;
+        const s = areas.reduce((a, b) => a + b, 0);
+        if (s <= 0) return Infinity;
+        let rmax = -Infinity, rmin = Infinity;
+        for (const a of areas) { if (a > rmax) rmax = a; if (a < rmin) rmin = a; }
+        return Math.max(short * short * rmax / (s * s), s * s / (short * short * rmin));
+    }
+
+    function tmLayoutRow(items, norm, idx, x0, z0, x1, z1) {
+        if (idx >= items.length) return;
+        const W = x1 - x0, H = z1 - z0;
+        if (W < 0.5 || H < 0.5) {
+            for (let i = idx; i < items.length; i++) {
+                items[i].rx0 = x0; items[i].rz0 = z0;
+                items[i].rx1 = x1; items[i].rz1 = z1;
+            }
+            return;
+        }
+        const short = Math.min(W, H);
+        const totalNorm = norm.slice(idx).reduce((s, v) => s + v, 0);
+        if (totalNorm <= 0) return;
+
+        let rowAreas = [norm[idx]];
+        for (let j = idx + 1; j < items.length; j++) {
+            const cand = rowAreas.concat(norm[j]);
+            if (tmWorst(rowAreas, short) >= tmWorst(cand, short)) {
+                rowAreas.push(norm[j]);
+            } else break;
+        }
+
+        const rowSum = rowAreas.reduce((s, v) => s + v, 0);
+        const isHoriz = W >= H;
+        const rowWidth = rowSum / totalNorm * (isHoriz ? W : H);
+        let pos = isHoriz ? z0 : x0;
+
+        rowAreas.forEach((a, k) => {
+            const itemLen = rowSum > 0 ? a / rowSum * short : 0;
+            const i = idx + k;
+            if (isHoriz) {
+                items[i].rx0 = x0;         items[i].rz0 = pos;
+                items[i].rx1 = x0 + rowWidth; items[i].rz1 = pos + itemLen;
+            } else {
+                items[i].rx0 = pos;         items[i].rz0 = z0;
+                items[i].rx1 = pos + itemLen; items[i].rz1 = z0 + rowWidth;
+            }
+            pos += itemLen;
+        });
+
+        const nextIdx = idx + rowAreas.length;
+        if (isHoriz) tmLayoutRow(items, norm, nextIdx, x0 + rowWidth, z0, x1, z1);
+        else         tmLayoutRow(items, norm, nextIdx, x0, z0 + rowWidth, x1, z1);
+    }
+
+    function squarifyLayout(items, x0, z0, x1, z1) {
+        if (!items.length) return;
+        items.sort((a, b) => b.value - a.value);
+        const total = items.reduce((s, i) => s + i.value, 0);
+        if (total <= 0) return;
+        const area = (x1 - x0) * (z1 - z0);
+        const norm = items.map(i => i.value / total * area);
+        tmLayoutRow(items, norm, 0, x0, z0, x1, z1);
+    }
+
+    // ══════════════════════════════
+    // 레이아웃 계산 (분야 → 단위사업)
+    // ══════════════════════════════
+    function computeLayouts() {
+        const fieldBudgets = {}, fieldMap = {};
+        mapData.buildings.forEach(b => {
+            fieldBudgets[b.field] = (fieldBudgets[b.field] || 0) + b.bud;
+            if (!fieldMap[b.field]) fieldMap[b.field] = [];
+            fieldMap[b.field].push(b);
+        });
+
+        // 분야 트리맵
+        const fItems = Object.entries(fieldBudgets).map(([name, value]) => ({name, value}));
+        const GH = GROUND_HALF;
+        squarifyLayout(fItems, -GH, -GH, GH, GH);
+        fieldLayouts = fItems;
+
+        // 각 분야 내 단위사업 트리맵
+        const PAD = 18;
+        fItems.forEach(f => {
+            const blds = fieldMap[f.name] || [];
+            const bItems = blds.map(b => ({ref: b, value: Math.max(b.bud, 1)}));
+            if (!bItems.length) return;
+            squarifyLayout(bItems, f.rx0 + PAD, f.rz0 + PAD, f.rx1 - PAD, f.rz1 - PAD);
+            bItems.forEach(bi => {
+                const b = bi.ref;
+                const cw = bi.rx1 - bi.rx0, ch = bi.rz1 - bi.rz0;
+                b.x = (bi.rx0 + bi.rx1) / 2;
+                b.z = (bi.rz0 + bi.rz1) / 2;
+                b.bs = Math.max(4, Math.min(55, Math.min(cw, ch) * 0.72));
+            });
+        });
     }
 
     // ══════════════════════════════
@@ -206,13 +306,13 @@
     function initThree() {
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0d1117);
-        scene.fog = new THREE.Fog(0x0d1117, 1200, 3200);
+        scene.fog = new THREE.Fog(0x0d1117, 3000, 7000);
 
         const w = window.innerWidth, h = window.innerHeight;
-        camera = new THREE.PerspectiveCamera(50, w/h, 1, 6000);
+        camera = new THREE.PerspectiveCamera(50, w / h, 1, 9000);
         updateCamera();
 
-        renderer = new THREE.WebGLRenderer({antialias:true});
+        renderer = new THREE.WebGLRenderer({antialias: true});
         renderer.setSize(w, h);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
@@ -222,12 +322,13 @@
         // 조명
         scene.add(new THREE.AmbientLight(0x1e3050, 3.2));
         const sun = new THREE.DirectionalLight(0xffffff, 2.8);
-        sun.position.set(800, 1500, 600);
+        sun.position.set(1000, 2000, 800);
         sun.castShadow = true;
         sun.shadow.mapSize.set(2048, 2048);
-        sun.shadow.camera.near = 1; sun.shadow.camera.far = 5000;
-        sun.shadow.camera.left = -2500; sun.shadow.camera.right = 2500;
-        sun.shadow.camera.top = 2500; sun.shadow.camera.bottom = -2500;
+        sun.shadow.camera.left = sun.shadow.camera.bottom = -3000;
+        sun.shadow.camera.right = sun.shadow.camera.top = 3000;
+        sun.shadow.camera.near = 1;
+        sun.shadow.camera.far = 8000;
         scene.add(sun);
         const fill = new THREE.DirectionalLight(0x4080ff, 1.0);
         fill.position.set(-600, 600, -600);
@@ -235,22 +336,18 @@
 
         // 바닥
         const ground = new THREE.Mesh(
-            new THREE.PlaneGeometry(9000, 9000),
-            new THREE.MeshLambertMaterial({color:0x161b22})
+            new THREE.PlaneGeometry(12000, 12000),
+            new THREE.MeshLambertMaterial({color: 0x0a0e14})
         );
-        ground.rotation.x = -Math.PI/2;
+        ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
         scene.add(ground);
-        const grid = new THREE.GridHelper(7000, 70, 0x21262d, 0x21262d);
-        grid.position.y = 0.5;
-        scene.add(grid);
 
         raycaster = new THREE.Raycaster();
         mouse = new THREE.Vector2();
-
         setupControls();
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth/window.innerHeight;
+            camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
@@ -272,150 +369,168 @@
     function setupControls() {
         const el = renderer.domElement;
         el.addEventListener('mousedown', e => {
-            if (e.button===2) isRightDragging=true; else isDragging=true;
-            lastMouse={x:e.clientX, y:e.clientY};
+            if (e.button === 2) isRightDragging = true; else isDragging = true;
+            lastMouse = {x: e.clientX, y: e.clientY};
         });
         el.addEventListener('mousemove', e => {
-            const dx=e.clientX-lastMouse.x, dy=e.clientY-lastMouse.y;
+            const dx = e.clientX - lastMouse.x, dy = e.clientY - lastMouse.y;
             if (isDragging) {
-                spherical.theta -= dx*0.005;
-                spherical.phi = Math.max(0.08, Math.min(Math.PI/2-0.04, spherical.phi+dy*0.005));
+                spherical.theta -= dx * 0.005;
+                spherical.phi = Math.max(0.06, Math.min(Math.PI / 2 - 0.02, spherical.phi + dy * 0.005));
                 updateCamera();
             } else if (isRightDragging) {
-                const s=spherical.radius/1000;
-                target.x -= dx*s; target.z -= dy*s;
+                const s = spherical.radius / 1000;
+                target.x -= dx * s; target.z -= dy * s;
                 updateCamera();
             }
-            lastMouse={x:e.clientX, y:e.clientY};
+            lastMouse = {x: e.clientX, y: e.clientY};
             updateTooltip(e);
         });
-        window.addEventListener('mouseup', ()=>{isDragging=false; isRightDragging=false;});
-        el.addEventListener('wheel', e=>{
-            spherical.radius = Math.max(80, Math.min(3200, spherical.radius+e.deltaY*0.8));
+        window.addEventListener('mouseup', () => { isDragging = false; isRightDragging = false; });
+        el.addEventListener('wheel', e => {
+            spherical.radius = Math.max(80, Math.min(6000, spherical.radius + e.deltaY * 1.0));
             updateCamera();
-        });
-        el.addEventListener('click', e=>handleClick(e));
-        el.addEventListener('contextmenu', e=>e.preventDefault());
+        }, {passive: true});
+        el.addEventListener('click', e => handleClick(e));
+        el.addEventListener('contextmenu', e => e.preventDefault());
 
-        // 터치
-        let lastTouches=[];
-        el.addEventListener('touchstart', e=>{lastTouches=[...e.touches];});
-        el.addEventListener('touchmove', e=>{
+        let lastTouches = [];
+        el.addEventListener('touchstart', e => { lastTouches = [...e.touches]; });
+        el.addEventListener('touchmove', e => {
             e.preventDefault();
-            if (e.touches.length===1) {
-                spherical.theta -= (e.touches[0].clientX-lastTouches[0].clientX)*0.005;
-                spherical.phi = Math.max(0.08, Math.min(Math.PI/2-0.04, spherical.phi+(e.touches[0].clientY-lastTouches[0].clientY)*0.005));
+            if (e.touches.length === 1) {
+                spherical.theta -= (e.touches[0].clientX - lastTouches[0].clientX) * 0.005;
+                spherical.phi = Math.max(0.06, Math.min(Math.PI / 2 - 0.02,
+                    spherical.phi + (e.touches[0].clientY - lastTouches[0].clientY) * 0.005));
                 updateCamera();
-            } else if (e.touches.length===2) {
-                const d0=Math.hypot(lastTouches[0].clientX-lastTouches[1].clientX, lastTouches[0].clientY-lastTouches[1].clientY);
-                const d1=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-                spherical.radius = Math.max(80, Math.min(3200, spherical.radius*(d0/d1)));
+            } else if (e.touches.length === 2) {
+                const d0 = Math.hypot(lastTouches[0].clientX - lastTouches[1].clientX, lastTouches[0].clientY - lastTouches[1].clientY);
+                const d1 = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                spherical.radius = Math.max(80, Math.min(6000, spherical.radius * (d0 / d1)));
                 updateCamera();
             }
-            lastTouches=[...e.touches];
-        },{passive:false});
+            lastTouches = [...e.touches];
+        }, {passive: false});
     }
 
     // ══════════════════════════════
-    // 다층 건물 생성
+    // 분야 트리맵 바닥 생성
+    // ══════════════════════════════
+    function makeLabel(text, color, w, h) {
+        const cw = 512, ch = 96;
+        const canvas = document.createElement('canvas');
+        canvas.width = cw; canvas.height = ch;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, cw, ch);
+        ctx.fillStyle = 'rgba(10,14,20,0.72)';
+        ctx.fillRect(16, 12, cw - 32, ch - 24);
+        ctx.font = 'bold 30px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0,0,0,0.95)';
+        ctx.shadowBlur = 8;
+        ctx.fillText(text, cw / 2, ch / 2);
+        return canvas;
+    }
+
+    function createFieldFloors() {
+        fieldLayouts.forEach(f => {
+            const colorInt = FIELD_COLORS_INT[f.name] || 0x6b7280;
+            const colorHex = FIELD_COLORS_HEX[f.name] || '#6b7280';
+            const fw = f.rx1 - f.rx0, fh = f.rz1 - f.rz0;
+            const cx = (f.rx0 + f.rx1) / 2, cz = (f.rz0 + f.rz1) / 2;
+
+            // 바닥 색상 면
+            const floorMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(fw - 2, fh - 2),
+                new THREE.MeshLambertMaterial({color: colorInt, transparent: true, opacity: 0.14, side: THREE.DoubleSide})
+            );
+            floorMesh.rotation.x = -Math.PI / 2;
+            floorMesh.position.set(cx, 0.5, cz);
+            scene.add(floorMesh);
+            fieldFloorMeshes.push(floorMesh);
+
+            // 경계 테두리 (LineLoop)
+            const borderPts = [
+                new THREE.Vector3(f.rx0 + 1, 1.8, f.rz0 + 1),
+                new THREE.Vector3(f.rx1 - 1, 1.8, f.rz0 + 1),
+                new THREE.Vector3(f.rx1 - 1, 1.8, f.rz1 - 1),
+                new THREE.Vector3(f.rx0 + 1, 1.8, f.rz1 - 1),
+            ];
+            const borderGeo = new THREE.BufferGeometry().setFromPoints(borderPts);
+            const border = new THREE.LineLoop(borderGeo, new THREE.LineBasicMaterial({color: colorInt, transparent: true, opacity: 0.6}));
+            scene.add(border);
+            fieldFloorMeshes.push(border);
+
+            // 분야명 라벨 스프라이트
+            const labelCanvas = makeLabel(f.name, colorHex, fw, fh);
+            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: new THREE.CanvasTexture(labelCanvas),
+                transparent: true, opacity: 0.92
+            }));
+            const labelW = Math.max(80, Math.min(240, fw * 0.55));
+            sprite.position.set(cx, 42, cz);
+            sprite.scale.set(labelW, labelW * 96 / 512, 1);
+            scene.add(sprite);
+            labelSprites.push(sprite);
+        });
+    }
+
+    // ══════════════════════════════
+    // 단위사업 건물 (세부사업 층 적층)
     // ══════════════════════════════
     function createBuildings() {
         mapData.buildings.forEach(b => {
+            if (b.x == null) return;
             const totalHeight = calcHeight(b.bud);
-            const floors = b.bl.length > 0 ? b.bl : [{name:b.name, bud:b.bud}];
-            const totalFloorBud = floors.reduce((s,f)=>s+f.bud, 0);
-            const bs = Math.max(3.5, Math.min(40, (b.bud/800)**0.38));
+            const floors = b.bl.length > 0 ? b.bl : [{name: b.name, bud: b.bud}];
+            const totalFloorBud = floors.reduce((s, f) => s + f.bud, 0);
+            const bs = b.bs || 8;
 
-            // 각 세부사업 층을 쌓음
             let yOffset = 0;
             const meshes = [];
+
             floors.forEach((floor, fi) => {
                 const floorH = totalFloorBud > 0
                     ? Math.max(1, (floor.bud / totalFloorBud) * totalHeight)
                     : totalHeight / floors.length;
                 const colorInt = FLOOR_PALETTE_INT[fi % FLOOR_PALETTE_INT.length];
 
-                const geo = new THREE.BoxGeometry(bs, floorH, bs);
-                const mat = new THREE.MeshLambertMaterial({color:colorInt, transparent:true, opacity:0.88});
-                const mesh = new THREE.Mesh(geo, mat);
-                mesh.position.set(b.x, yOffset + floorH/2, b.z);
+                const mesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(bs, floorH, bs),
+                    new THREE.MeshLambertMaterial({color: colorInt, transparent: true, opacity: 0.88})
+                );
+                mesh.position.set(b.x, yOffset + floorH / 2, b.z);
                 mesh.castShadow = true;
                 mesh.receiveShadow = true;
-                // 건물 데이터를 모든 층 mesh에 저장
-                mesh.userData = {building:b, floorIdx:fi, floorName:floor.name, floorBud:floor.bud};
+                mesh.userData = {building: b, floorIdx: fi, floorName: floor.name, floorBud: floor.bud};
                 scene.add(mesh);
                 meshes.push(mesh);
                 yOffset += floorH;
 
-                // 층 경계선 (얇은 선)
-                if (fi < floors.length-1 && floorH > 2) {
-                    const lineGeo = new THREE.BoxGeometry(bs+0.3, 0.6, bs+0.3);
-                    const lineMat = new THREE.MeshBasicMaterial({color:0x0d1117, transparent:true, opacity:0.5});
-                    const line = new THREE.Mesh(lineGeo, lineMat);
-                    line.position.set(b.x, yOffset, b.z);
-                    scene.add(line);
+                // 층 구분선
+                if (fi < floors.length - 1 && floorH > 2) {
+                    const sep = new THREE.Mesh(
+                        new THREE.BoxGeometry(bs + 0.3, 0.5, bs + 0.3),
+                        new THREE.MeshBasicMaterial({color: 0x0d1117, transparent: true, opacity: 0.55})
+                    );
+                    sep.position.set(b.x, yOffset, b.z);
+                    scene.add(sep);
                 }
             });
 
-            // 옥상 하이라이트 (분야 색)
-            const roofColor = FIELD_COLORS_INT[b.field] || 0x6b7280;
+            // 옥상 (분야 색)
             const roof = new THREE.Mesh(
-                new THREE.BoxGeometry(bs+0.5, 1.2, bs+0.5),
-                new THREE.MeshLambertMaterial({color:roofColor, transparent:true, opacity:0.95})
+                new THREE.BoxGeometry(bs + 0.6, 1.4, bs + 0.6),
+                new THREE.MeshLambertMaterial({color: FIELD_COLORS_INT[b.field] || 0x6b7280, transparent: true, opacity: 0.95})
             );
-            roof.position.set(b.x, yOffset+0.6, b.z);
-            roof.userData = {building:b, floorIdx:-1, floorName:'옥상', floorBud:b.bud};
+            roof.position.set(b.x, yOffset + 0.7, b.z);
+            roof.userData = {building: b, floorIdx: -1, floorName: '옥상', floorBud: b.bud};
             scene.add(roof);
             meshes.push(roof);
 
-            buildingMeshGroups.push({data:b, meshes});
-        });
-    }
-
-    // ══════════════════════════════
-    // 분야 구역 링 + 라벨
-    // ══════════════════════════════
-    function createRings() {
-        mapData.groups.forEach(g => {
-            const color = FIELD_COLORS_INT[g.name] || 0x6b7280;
-            const r = g.radius + 22;
-
-            const ring = new THREE.Mesh(
-                new THREE.RingGeometry(r-3, r, 64),
-                new THREE.MeshBasicMaterial({color, transparent:true, opacity:0.22, side:THREE.DoubleSide})
-            );
-            ring.rotation.x = -Math.PI/2;
-            ring.position.set(g.cx, 1.5, g.cz);
-            scene.add(ring);
-            rings.push(ring);
-
-            // 바닥 원 채우기 (매우 투명)
-            const floor = new THREE.Mesh(
-                new THREE.CircleGeometry(r, 64),
-                new THREE.MeshBasicMaterial({color, transparent:true, opacity:0.05, side:THREE.DoubleSide})
-            );
-            floor.rotation.x = -Math.PI/2;
-            floor.position.set(g.cx, 1, g.cz);
-            scene.add(floor);
-            rings.push(floor);
-
-            // 스프라이트 라벨
-            const canvas = document.createElement('canvas');
-            canvas.width = 512; canvas.height = 100;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0,0,512,100);
-            ctx.font = 'bold 28px "Noto Sans KR", sans-serif';
-            ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.shadowColor = 'rgba(0,0,0,0.8)';
-            ctx.shadowBlur = 6;
-            ctx.fillText(g.name, 256, 50);
-            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas), transparent:true, opacity:0.92}));
-            sprite.position.set(g.cx, 35, g.cz - r - 8);
-            sprite.scale.set(180, 36, 1);
-            scene.add(sprite);
-            labelSprites.push(sprite);
+            buildingMeshGroups.push({data: b, meshes});
         });
     }
 
@@ -425,16 +540,16 @@
     function toggleLabels() {
         showLabels = !showLabels;
         document.getElementById('btn-labels').classList.toggle('active', showLabels);
-        labelSprites.forEach(s => s.visible=showLabels);
+        labelSprites.forEach(s => s.visible = showLabels);
     }
-    function toggleRings() {
-        showRings = !showRings;
-        document.getElementById('btn-rings').classList.toggle('active', showRings);
-        rings.forEach(r => r.visible=showRings);
+    function toggleFloors() {
+        showFloors = !showFloors;
+        document.getElementById('btn-floors').classList.toggle('active', showFloors);
+        fieldFloorMeshes.forEach(m => m.visible = showFloors);
     }
     function resetCamera() {
-        spherical={theta:Math.PI/6, phi:Math.PI/3, radius:1800};
-        target={x:0,y:0,z:0};
+        spherical = {theta: Math.PI / 5, phi: Math.PI / 3.2, radius: 4500};
+        target = {x: 0, y: 0, z: 0};
         updateCamera();
     }
     function toggleField(fieldName) {
@@ -442,23 +557,26 @@
         else hiddenFields.add(fieldName);
         const hidden = hiddenFields.has(fieldName);
         buildingMeshGroups.forEach(g => {
-            if (g.data.field===fieldName) g.meshes.forEach(m=>m.visible=!hidden);
+            if (g.data.field === fieldName) g.meshes.forEach(m => m.visible = !hidden);
         });
-        document.querySelectorAll('.legend-item').forEach(el=>{
-            if (el.dataset.field===fieldName) el.classList.toggle('hidden', hidden);
+        document.querySelectorAll('.legend-item').forEach(el => {
+            if (el.dataset.field === fieldName) el.classList.toggle('hidden', hidden);
         });
     }
 
     // ══════════════════════════════
-    // 레이캐스트
+    // 레이캐스트 / 툴팁 / 클릭
     // ══════════════════════════════
     function getRaycastHit(e) {
         const rect = renderer.domElement.getBoundingClientRect();
-        mouse.x = ((e.clientX-rect.left)/rect.width)*2-1;
-        mouse.y = -((e.clientY-rect.top)/rect.height)*2+1;
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
         const allMeshes = [];
-        buildingMeshGroups.forEach(g => { if (!hiddenFields.has(g.data.field)) g.meshes.forEach(m=>{if(m.visible)allMeshes.push(m);}); });
+        buildingMeshGroups.forEach(g => {
+            if (!hiddenFields.has(g.data.field))
+                g.meshes.forEach(m => { if (m.visible) allMeshes.push(m); });
+        });
         const hits = raycaster.intersectObjects(allMeshes);
         return hits.length ? hits[0] : null;
     }
@@ -466,18 +584,18 @@
     function updateTooltip(e) {
         const hit = getRaycastHit(e);
         const tt = document.getElementById('tooltip');
-        if (!hit) { tt.style.display='none'; return; }
+        if (!hit) { tt.style.display = 'none'; return; }
         const {building, floorIdx, floorName, floorBud} = hit.object.userData;
-        if (!building) { tt.style.display='none'; return; }
-        const fc = FIELD_COLORS_HEX[building.field]||'#6b7280';
+        if (!building) { tt.style.display = 'none'; return; }
+        const fc = FIELD_COLORS_HEX[building.field] || '#6b7280';
         let floorInfo = '';
         if (floorIdx >= 0) {
-            const fc2 = FLOOR_PALETTE_HEX[floorIdx%FLOOR_PALETTE_HEX.length];
+            const fc2 = FLOOR_PALETTE_HEX[floorIdx % FLOOR_PALETTE_HEX.length];
             floorInfo = `<div class="tt-floor"><span style="color:${fc2}">■</span> 세부사업: ${floorName} (${fmtBudget(floorBud)})</div>`;
         }
-        tt.style.display='block';
-        tt.style.left=(e.clientX+16)+'px';
-        tt.style.top=(Math.min(e.clientY-10, window.innerHeight-160))+'px';
+        tt.style.display = 'block';
+        tt.style.left = (e.clientX + 16) + 'px';
+        tt.style.top = Math.min(e.clientY - 10, window.innerHeight - 170) + 'px';
         tt.innerHTML = `
             <div class="tt-name">${building.name}</div>
             <div class="tt-budget">${fmtBudget(building.bud)}</div>
@@ -492,10 +610,10 @@
         if (!hit) { closeInfo(); return; }
         const {building} = hit.object.userData;
         if (!building) return;
-        const fc = FIELD_COLORS_HEX[building.field]||'#6b7280';
-        const floors = building.bl.length>0 ? building.bl : [{name:building.name, bud:building.bud}];
-        const floorsHtml = floors.map((f,i)=>{
-            const fc2 = FLOOR_PALETTE_HEX[i%FLOOR_PALETTE_HEX.length];
+        const fc = FIELD_COLORS_HEX[building.field] || '#6b7280';
+        const floors = building.bl.length > 0 ? building.bl : [{name: building.name, bud: building.bud}];
+        const floorsHtml = floors.map((f, i) => {
+            const fc2 = FLOOR_PALETTE_HEX[i % FLOOR_PALETTE_HEX.length];
             return `<div class="ip-floor-item">
                 <div class="ip-floor-dot" style="background:${fc2}"></div>
                 <div class="ip-floor-name">${f.name}</div>
@@ -507,42 +625,44 @@
             <div class="ip-budget">${fmtBudget(building.bud)}</div>
             <div class="ip-row"><span>소관부처</span><span class="ip-val">${building.min}</span></div>
             <div class="ip-row"><span>분야</span><span class="ip-val" style="color:${fc}">${building.field}</span></div>
-            <div class="ip-row"><span>부문</span><span class="ip-val">${building.subfield||''}</span></div>
+            <div class="ip-row"><span>부문</span><span class="ip-val">${building.subfield || ''}</span></div>
             <div class="ip-row"><span>세부사업(층) 수</span><span class="ip-val">${floors.length}개</span></div>
-            ${floors.length>0?`<div style="margin-top:8px;font-size:10px;color:#6e7681;margin-bottom:2px">층별 세부사업 (아래→위)</div><div class="ip-floors">${floorsHtml}</div>`:''}`;
-        document.getElementById('info-panel').style.display='block';
+            ${floors.length > 0 ? `<div style="margin-top:8px;font-size:10px;color:#6e7681;margin-bottom:2px">층별 세부사업 (아래→위)</div><div class="ip-floors">${floorsHtml}</div>` : ''}`;
+        document.getElementById('info-panel').style.display = 'block';
 
         // 선택 강조
-        buildingMeshGroups.forEach(g=>{
-            g.meshes.forEach(m=>{
-                m.material.emissive = new THREE.Color(0x000000);
-                m.material.emissiveIntensity = 0;
-            });
+        buildingMeshGroups.forEach(g => g.meshes.forEach(m => {
+            if (m.material && m.material.emissive) { m.material.emissive.set(0x000000); m.material.emissiveIntensity = 0; }
+        }));
+        const grp = buildingMeshGroups.find(g => g.data === building);
+        if (grp) grp.meshes.forEach(m => {
+            if (m.material && m.material.emissive) { m.material.emissive.set(0xffffff); m.material.emissiveIntensity = 0.28; }
         });
-        const grp = buildingMeshGroups.find(g=>g.data===building);
-        if (grp) grp.meshes.forEach(m=>{ m.material.emissive=new THREE.Color(0xffffff); m.material.emissiveIntensity=0.25; });
     }
 
     function closeInfo() {
-        document.getElementById('info-panel').style.display='none';
-        buildingMeshGroups.forEach(g=>{
-            g.meshes.forEach(m=>{ m.material.emissive=new THREE.Color(0x000000); m.material.emissiveIntensity=0; });
-        });
+        document.getElementById('info-panel').style.display = 'none';
+        buildingMeshGroups.forEach(g => g.meshes.forEach(m => {
+            if (m.material && m.material.emissive) { m.material.emissive.set(0x000000); m.material.emissiveIntensity = 0; }
+        }));
     }
 
     // ══════════════════════════════
     // 범례
     // ══════════════════════════════
     function buildLegend() {
+        const fieldCount = {};
+        mapData.buildings.forEach(b => { fieldCount[b.field] = (fieldCount[b.field] || 0) + 1; });
+        const sorted = [...fieldLayouts].sort((a, b) => b.value - a.value);
         const list = document.getElementById('legend-list');
-        mapData.groups.forEach(g=>{
-            const fc = FIELD_COLORS_HEX[g.name]||'#6b7280';
+        sorted.forEach(f => {
+            const fc = FIELD_COLORS_HEX[f.name] || '#6b7280';
             const item = document.createElement('div');
-            item.className='legend-item'; item.dataset.field=g.name;
-            item.onclick=()=>toggleField(g.name);
-            item.innerHTML=`<div class="legend-dot" style="background:${fc}"></div>
-                <div class="legend-name">${g.name}</div>
-                <div class="legend-meta">${g.count}</div>`;
+            item.className = 'legend-item'; item.dataset.field = f.name;
+            item.onclick = () => toggleField(f.name);
+            item.innerHTML = `<div class="legend-dot" style="background:${fc}"></div>
+                <div class="legend-name">${f.name}</div>
+                <div class="legend-meta">${fieldCount[f.name] || 0}</div>`;
             list.appendChild(item);
         });
     }
@@ -562,18 +682,20 @@
         const res = await fetch('map3d.json');
         mapData = await res.json();
 
-        const totalBudget = mapData.buildings.reduce((s,b)=>s+b.bud, 0);
-        const totalSub = mapData.buildings.reduce((s,b)=>s+b.bl.length, 0);
-        document.getElementById('h-budget').textContent = (totalBudget/1000000).toFixed(1);
-        document.getElementById('h-bldg').textContent = mapData.buildings.length.toLocaleString();
-        document.getElementById('h-sub').textContent = totalSub.toLocaleString();
+        const totalBudget = mapData.buildings.reduce((s, b) => s + b.bud, 0);
+        const totalSub    = mapData.buildings.reduce((s, b) => s + b.bl.length, 0);
+        document.getElementById('h-budget').textContent = (totalBudget / 1000000).toFixed(1);
+        document.getElementById('h-field').textContent  = new Set(mapData.buildings.map(b => b.field)).size;
+        document.getElementById('h-bldg').textContent   = mapData.buildings.length.toLocaleString();
+        document.getElementById('h-sub').textContent    = totalSub.toLocaleString();
 
+        computeLayouts();
         initThree();
+        createFieldFloors();
         createBuildings();
-        createRings();
         buildLegend();
         animate();
-        document.getElementById('loading').style.display='none';
+        document.getElementById('loading').style.display = 'none';
     }
 
     init().catch(console.error);

@@ -6,13 +6,13 @@
     <title>한 눈에 보는 2026년 정부 예산안</title>
     <meta property="og:title" content="한 눈에 보는 2026년 정부예산안">
     <meta property="og:description" content="2026년 정부예산안 624.8조원, 61개 부처 2,275개 세부사업의 분야별·부처별 예산 배분 현황을 한눈에 파악할 수 있는 인터랙티브 분석 플랫폼">
-    <meta property="og:image" content="https://danue1.github.io/fiscal-budget-2026/og-image.png">
-    <meta property="og:url" content="https://danue1.github.io/fiscal-budget-2026/">
+    <meta property="og:image" content="https://msitsti2025.github.io/fiscal-budget-2026/og-image.png">
+    <meta property="og:url" content="https://msitsti2025.github.io/fiscal-budget-2026/">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="한 눈에 보는 2026년 정부예산안">
     <meta name="twitter:description" content="2026년 정부예산안 624.8조원, 61개 부처 2,275개 세부사업의 분야별·부처별 예산 배분 현황">
-    <meta name="twitter:image" content="https://danue1.github.io/fiscal-budget-2026/og-image.png">
+    <meta name="twitter:image" content="https://msitsti2025.github.io/fiscal-budget-2026/og-image.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
@@ -148,6 +148,18 @@
         .treemap-cell.small .treemap-cell-val{font-size:10px;}
         .treemap-cell.tiny .treemap-cell-name{font-size:10px;}
         .treemap-cell.tiny .treemap-cell-val,.treemap-cell.tiny .treemap-cell-pct{display:none;}
+        .nested-treemap-field{position:absolute;border:2px solid #fff;border-radius:8px;overflow:hidden;box-sizing:border-box;}
+        .nested-field-label{position:absolute;top:0;left:0;right:0;padding:6px 10px;font-size:12px;font-weight:700;color:#fff;z-index:5;text-shadow:0 1px 3px rgba(0,0,0,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;}
+        .nested-field-label small{font-weight:500;opacity:.8;margin-left:6px;font-size:10px;}
+        .nested-sub-cell{position:absolute;display:flex;flex-direction:column;justify-content:flex-end;padding:6px 8px;cursor:default;transition:filter .15s;overflow:hidden;border:1px solid rgba(255,255,255,.35);border-radius:4px;box-sizing:border-box;}
+        .nested-sub-cell:hover{filter:brightness(.88);z-index:10;}
+        .nested-sub-cell .sub-name{font-size:11px;font-weight:600;color:#fff;line-height:1.2;text-shadow:0 1px 2px rgba(0,0,0,.3);}
+        .nested-sub-cell .sub-val{font-size:10px;font-weight:500;color:rgba(255,255,255,.85);margin-top:2px;text-shadow:0 1px 2px rgba(0,0,0,.3);}
+        .nested-sub-cell .sub-pct{font-size:9px;color:rgba(255,255,255,.7);margin-top:1px;}
+        .nested-sub-cell.nsm .sub-name{font-size:10px;}
+        .nested-sub-cell.nsm .sub-pct{display:none;}
+        .nested-sub-cell.nst .sub-name{font-size:9px;}
+        .nested-sub-cell.nst .sub-val,.nested-sub-cell.nst .sub-pct{display:none;}
         .section-divider{font-size:14px;font-weight:700;color:var(--text2);padding:10px 0 4px;border-bottom:2px solid var(--border);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
         @media(max-width:1200px){
             .main-layout{grid-template-columns:1fr;}
@@ -297,6 +309,13 @@
                     <div class="kpi-card purple"><div class="kpi-label">최대 부문</div><div class="kpi-value" id="sf-k-max">-</div><div class="kpi-sub" id="sf-k-max-name">-</div></div>
                 </div>
                 <div class="chart-card wide">
+                    <div class="chart-title">
+                        <span class="chart-title-dot" style="background:#7c3aed"></span>
+                        분야별 부문 예산 트리맵 · 박스 크기 ∝ 예산 규모
+                    </div>
+                    <div id="sf-nested-treemap" class="treemap-container" style="height:560px;"></div>
+                </div>
+                <div class="chart-card wide">
                     <div class="chart-title"><span class="chart-title-dot" style="background:#2563eb"></span>부문별 예산 규모 (상위 30)</div>
                     <div class="chart-wrap h400"><canvas id="sf-bar-chart"></canvas></div>
                 </div>
@@ -331,6 +350,7 @@
                     <div class="kpi-card yellow"><div class="kpi-label">단위사업 수</div><div class="kpi-value" id="pg-k-proj">-</div><div class="kpi-sub">개 사업</div></div>
                     <div class="kpi-card purple"><div class="kpi-label">최대 프로그램</div><div class="kpi-value" id="pg-k-max">-</div><div class="kpi-sub" id="pg-k-max-name">-</div></div>
                 </div>
+                <div id="pg-field-treemaps"></div>
                 <div class="chart-card wide">
                     <div class="chart-title"><span class="chart-title-dot" style="background:#7c3aed"></span>프로그램별 예산 규모 (상위 30)</div>
                     <div class="chart-wrap h400"><canvas id="pg-bar-chart"></canvas></div>
@@ -974,6 +994,73 @@
     }
 
     // ══════════════════════════════
+    // 분야>부문 중첩 트리맵
+    // ══════════════════════════════
+    function renderNestedSubfieldTreemap() {
+        const container = document.getElementById('sf-nested-treemap');
+        if (!container) return;
+        container.innerHTML = '';
+        const W = container.offsetWidth || 800;
+        const H = container.offsetHeight || 560;
+        const total = filtered.reduce((s,r) => s + r.budget, 0);
+        if (!total) return;
+
+        // 분야별 집계 + 각 분야 안에 부문별 집계
+        const fieldMap = {};
+        filtered.forEach(r => {
+            if (!fieldMap[r.field]) fieldMap[r.field] = { label: r.field, budget: 0, subs: {} };
+            fieldMap[r.field].budget += r.budget;
+            if (!fieldMap[r.field].subs[r.subfield]) fieldMap[r.field].subs[r.subfield] = { label: r.subfield, budget: 0 };
+            fieldMap[r.field].subs[r.subfield].budget += r.budget;
+        });
+        const fieldList = Object.values(fieldMap).filter(d => d.budget > 0).sort((a,b) => b.budget - a.budget);
+        const fieldItems = fieldList.map(d => ({ ...d, area: (d.budget / total) * W * H }));
+        const fieldRects = squarify(fieldItems, 0, 0, W, H);
+
+        const LABEL_H = 28; // 분야 라벨 높이
+
+        fieldRects.forEach(fr => {
+            // 분야 컨테이너
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'nested-treemap-field';
+            const color = FIELD_COLORS[fr.label] || '#6b7280';
+            fieldDiv.style.cssText = `left:${fr.x}px;top:${fr.y}px;width:${fr.w}px;height:${fr.h}px;background:${color}22;`;
+            fieldDiv.title = `${fr.label}: ${fmtM(fr.budget)} 백만원 (${pct(fr.budget, total)})`;
+
+            // 분야 라벨
+            const label = document.createElement('div');
+            label.className = 'nested-field-label';
+            label.style.background = `linear-gradient(135deg, ${color}ee, ${color}cc)`;
+            label.innerHTML = `${fr.label}<small>${fmtBudget(fr.budget)} · ${pct(fr.budget, total)}</small>`;
+            fieldDiv.appendChild(label);
+
+            // 부문 트리맵 영역 (라벨 아래)
+            const subW = fr.w - 4; // 내부 패딩
+            const subH = fr.h - LABEL_H - 4;
+            if (subW > 10 && subH > 10) {
+                const subList = Object.values(fr.subs).sort((a,b) => b.budget - a.budget);
+                const subTotal = subList.reduce((s,d) => s + d.budget, 0);
+                const subItems = subList.map(d => ({ ...d, area: (d.budget / subTotal) * subW * subH }));
+                const subRects = squarify(subItems, 0, 0, subW, subH);
+
+                subRects.forEach(sr => {
+                    const cell = document.createElement('div');
+                    cell.className = 'nested-sub-cell';
+                    const sw = sr.w, sh = sr.h;
+                    if (sw < 50 || sh < 35) cell.classList.add('nst');
+                    else if (sw < 90 || sh < 55) cell.classList.add('nsm');
+                    cell.style.cssText = `left:${sr.x + 2}px;top:${sr.y + LABEL_H + 2}px;width:${sw}px;height:${sh}px;background:linear-gradient(135deg,${color}bb,${color}88);`;
+                    cell.title = `${sr.label}: ${fmtM(sr.budget)} 백만원 (${pct(sr.budget, total)})`;
+                    cell.innerHTML = `<div class="sub-name">${sr.label}</div><div class="sub-val">${fmtBudget(sr.budget)}</div><div class="sub-pct">${pct(sr.budget, fr.budget)}</div>`;
+                    fieldDiv.appendChild(cell);
+                });
+            }
+
+            container.appendChild(fieldDiv);
+        });
+    }
+
+    // ══════════════════════════════
     // ④ 부문별 현황
     // ══════════════════════════════
     let sfSortKey = 'budget', sfSortDir = -1, sfPage = 1;
@@ -1006,6 +1093,9 @@
         document.getElementById('sf-k-max').textContent = maxItem ? fmtBudget(maxItem.budget) : '-';
         document.getElementById('sf-k-max-name').textContent = maxItem ? maxItem.name.slice(0,14) : '-';
         document.getElementById('sf-table-count').textContent = `${list.length}개 부문`;
+
+        // 중첩 트리맵
+        renderNestedSubfieldTreemap();
 
         // Chart: top 30 by budget
         const top30 = [...list].sort((a,b)=>b.budget-a.budget).slice(0,30);
@@ -1056,7 +1146,113 @@
         pgPage = 1; renderProgram();
     }
 
+    // ══════════════════════════════
+    // 분야별 부문>프로그램 중첩 트리맵 (16개)
+    // ══════════════════════════════
+    function renderFieldProgramTreemaps() {
+        const wrap = document.getElementById('pg-field-treemaps');
+        if (!wrap) return;
+        wrap.innerHTML = '';
+
+        // 분야별 집계: 부문 > 프로그램
+        const fieldMap = {};
+        filtered.forEach(r => {
+            if (!fieldMap[r.field]) fieldMap[r.field] = { budget: 0, subs: {} };
+            fieldMap[r.field].budget += r.budget;
+            if (!fieldMap[r.field].subs[r.subfield]) fieldMap[r.field].subs[r.subfield] = { label: r.subfield, budget: 0, progs: {} };
+            fieldMap[r.field].subs[r.subfield].budget += r.budget;
+            const pk = r.program;
+            if (!fieldMap[r.field].subs[r.subfield].progs[pk]) fieldMap[r.field].subs[r.subfield].progs[pk] = { label: pk, budget: 0 };
+            fieldMap[r.field].subs[r.subfield].progs[pk].budget += r.budget;
+        });
+
+        // 예산 순으로 분야 정렬
+        const sortedFields = FIELD_NAMES.filter(f => fieldMap[f] && fieldMap[f].budget > 0)
+            .sort((a,b) => fieldMap[b].budget - fieldMap[a].budget);
+
+        sortedFields.forEach((fname, idx) => {
+            const fd = fieldMap[fname];
+            const color = FIELD_COLORS[fname] || '#6b7280';
+            const fieldTotal = fd.budget;
+
+            // 카드 컨테이너
+            const card = document.createElement('div');
+            card.className = 'chart-card wide';
+            card.style.marginBottom = '16px';
+
+            // 제목
+            const title = document.createElement('div');
+            title.className = 'chart-title';
+            title.innerHTML = `<span class="chart-title-dot" style="background:${color}"></span>
+                <span style="color:${color};font-weight:700">${String(idx+1).padStart(2,'0')}.</span>&nbsp;${fname} — 부문별 프로그램 트리맵
+                <span style="margin-left:auto;font-size:12px;font-weight:600;color:${color}">${fmtBudget(fieldTotal)}</span>`;
+            card.appendChild(title);
+
+            // 트리맵 컨테이너
+            const tmContainer = document.createElement('div');
+            tmContainer.className = 'treemap-container';
+            const subCount = Object.keys(fd.subs).length;
+            tmContainer.style.height = (subCount <= 3 ? 320 : subCount <= 8 ? 420 : 500) + 'px';
+            card.appendChild(tmContainer);
+            wrap.appendChild(card);
+
+            // 렌더링 (DOM에 추가된 후 크기 계산)
+            requestAnimationFrame(() => {
+                const W = tmContainer.offsetWidth || 800;
+                const H = tmContainer.offsetHeight || 420;
+                if (!W || !H) return;
+
+                const subList = Object.values(fd.subs).sort((a,b) => b.budget - a.budget);
+                const subItems = subList.map(d => ({ ...d, area: (d.budget / fieldTotal) * W * H }));
+                const subRects = squarify(subItems, 0, 0, W, H);
+
+                const LABEL_H = 26;
+
+                subRects.forEach(sr => {
+                    // 부문 컨테이너
+                    const subDiv = document.createElement('div');
+                    subDiv.className = 'nested-treemap-field';
+                    subDiv.style.cssText = `left:${sr.x}px;top:${sr.y}px;width:${sr.w}px;height:${sr.h}px;background:${color}15;`;
+                    subDiv.title = `${sr.label}: ${fmtM(sr.budget)} 백만원 (${pct(sr.budget, fieldTotal)})`;
+
+                    // 부문 라벨
+                    const lbl = document.createElement('div');
+                    lbl.className = 'nested-field-label';
+                    lbl.style.background = `linear-gradient(135deg,${color}dd,${color}bb)`;
+                    lbl.style.fontSize = sr.w < 120 ? '10px' : '11px';
+                    lbl.innerHTML = `${sr.label}<small>${fmtBudget(sr.budget)}</small>`;
+                    subDiv.appendChild(lbl);
+
+                    // 프로그램 트리맵
+                    const pW = sr.w - 4, pH = sr.h - LABEL_H - 4;
+                    if (pW > 8 && pH > 8) {
+                        const progList = Object.values(sr.progs).sort((a,b) => b.budget - a.budget);
+                        const progTotal = progList.reduce((s,d) => s + d.budget, 0);
+                        if (progTotal > 0) {
+                            const progItems = progList.map(d => ({ ...d, area: (d.budget / progTotal) * pW * pH }));
+                            const progRects = squarify(progItems, 0, 0, pW, pH);
+
+                            progRects.forEach(pr => {
+                                const cell = document.createElement('div');
+                                cell.className = 'nested-sub-cell';
+                                const cw = pr.w, ch = pr.h;
+                                if (cw < 45 || ch < 30) cell.classList.add('nst');
+                                else if (cw < 80 || ch < 50) cell.classList.add('nsm');
+                                cell.style.cssText = `left:${pr.x + 2}px;top:${pr.y + LABEL_H + 2}px;width:${cw}px;height:${ch}px;background:linear-gradient(135deg,${color}aa,${color}77);`;
+                                cell.title = `${pr.label}: ${fmtM(pr.budget)} 백만원 (${pct(pr.budget, fieldTotal)})`;
+                                cell.innerHTML = `<div class="sub-name">${pr.label}</div><div class="sub-val">${fmtBudget(pr.budget)}</div><div class="sub-pct">${pct(pr.budget, sr.budget)}</div>`;
+                                subDiv.appendChild(cell);
+                            });
+                        }
+                    }
+                    tmContainer.appendChild(subDiv);
+                });
+            });
+        });
+    }
+
     function renderProgram() {
+        renderFieldProgramTreemaps();
         const total = filtered.reduce((s,r) => s+r.budget, 0);
         const map = {};
         filtered.forEach(r => {
