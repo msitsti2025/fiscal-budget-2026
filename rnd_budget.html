@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>연구개발(R&D) 예산 현황 - 2026년 정부 예산안</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+        :root {
+            --bg:#f0f4f9; --surface:#fff; --surface2:#f8fafc; --surface3:#f1f5f9;
+            --border:#e2e8f0; --border2:#cbd5e1; --accent:#1d4ed8; --accent2:#2563eb;
+            --accent3:#3b82f6; --accent-light:#eff6ff; --green:#059669; --red:#dc2626;
+            --red-light:#fff5f5; --yellow:#d97706; --purple:#7c3aed; --teal:#0d9488;
+            --pink:#db2777; --text:#0f172a; --text2:#334155; --text3:#64748b;
+            --text4:#94a3b8; --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+            --radius:12px; --font:'Noto Sans KR',sans-serif;
+            --rnd-accent:#7c3aed; --rnd-accent2:#6d28d9; --rnd-light:#f5f3ff;
+        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;}
+        header{background:#fff;border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:200;box-shadow:var(--shadow);}
+        .header-inner{max-width:1640px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:62px;}
+        .logo{display:flex;align-items:center;gap:12px;}
+        .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#7c3aed,#2563eb);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 2px 8px rgba(124,58,237,.25);}
+        .logo-text{font-size:16px;font-weight:700;color:var(--text);}
+        .logo-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+        .back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;font-family:var(--font);transition:all .2s;}
+        .back-btn:hover{border-color:var(--rnd-accent);color:var(--rnd-accent);background:var(--rnd-light);}
+
+        /* Tab */
+        .tab-bar{background:#fff;border-bottom:2px solid var(--border);padding:0 24px;}
+        .tab-bar-inner{max-width:1640px;margin:0 auto;display:flex;gap:0;}
+        .tab-btn{padding:13px 20px;font-size:13px;font-weight:500;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;font-family:var(--font);white-space:nowrap;}
+        .tab-btn:hover{color:var(--rnd-accent);}
+        .tab-btn.active{color:var(--rnd-accent);border-bottom-color:var(--rnd-accent);font-weight:700;}
+
+        /* Layout */
+        .main{max-width:1640px;margin:0 auto;padding:24px;}
+        .tab-panel{display:none;flex-direction:column;gap:20px;}
+        .tab-panel.active{display:flex;}
+
+        /* KPI */
+        .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+        .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;box-shadow:var(--shadow);}
+        .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+        .kpi-card.purple::before{background:linear-gradient(90deg,#7c3aed,#2563eb);}
+        .kpi-card.blue::before{background:linear-gradient(90deg,#2563eb,#0d9488);}
+        .kpi-card.green::before{background:linear-gradient(90deg,#059669,#0d9488);}
+        .kpi-card.orange::before{background:linear-gradient(90deg,#ea580c,#d97706);}
+        .kpi-label{font-size:11px;color:var(--text3);margin-bottom:7px;font-weight:500;}
+        .kpi-value{font-size:26px;font-weight:700;color:var(--text);line-height:1;}
+        .kpi-unit{font-size:13px;font-weight:400;color:var(--text2);margin-left:3px;}
+        .kpi-sub{font-size:11px;color:var(--text3);margin-top:6px;}
+
+        /* Charts */
+        .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+        .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+        .chart-card.wide{grid-column:1/-1;}
+        .chart-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+        .chart-title-dot{width:8px;height:8px;border-radius:50%;background:var(--rnd-accent);flex-shrink:0;}
+        .chart-wrap{position:relative;height:280px;}
+        .chart-wrap.tall{height:360px;}
+
+        /* Table */
+        .table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+        .table-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2);}
+        .table-title{font-size:13px;font-weight:700;color:var(--text);}
+        .table-meta{display:flex;align-items:center;gap:8px;}
+        .badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;}
+        .badge-purple{color:var(--rnd-accent);background:var(--rnd-light);border:1px solid #ddd6fe;}
+        .badge-gray{color:var(--text3);background:var(--surface3);border:1px solid var(--border);}
+        .table-wrap{overflow-x:auto;}
+        table{width:100%;border-collapse:collapse;font-size:12px;}
+        th{background:var(--surface3);color:var(--text3);font-weight:700;padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap;font-size:11px;}
+        td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle;}
+        tr:last-child td{border-bottom:none;}
+        tr:hover td{background:#faf5ff;}
+        .td-name{color:var(--text);font-weight:500;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        .td-budget{color:var(--rnd-accent);font-weight:700;text-align:right;font-variant-numeric:tabular-nums;}
+        .chip{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;white-space:nowrap;font-weight:600;border:1px solid;}
+        .chip-purple{color:#6d28d9;background:#f5f3ff;border-color:#ddd6fe;}
+        .chip-blue{color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe;}
+        .chip-green{color:#065f46;background:#ecfdf5;border-color:#a7f3d0;}
+        .chip-orange{color:#92400e;background:#fffbeb;border-color:#fde68a;}
+        .chip-teal{color:#134e4a;background:#f0fdfa;border-color:#99f6e4;}
+        .chip-red{color:#991b1b;background:#fff5f5;border-color:#fecaca;}
+        .chip-gray{color:#374151;background:#f9fafb;border-color:#e5e7eb;}
+
+        /* Dashboard grid */
+        .dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+        .rank-list{display:flex;flex-direction:column;gap:8px;}
+        .rank-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);}
+        .rank-num{width:24px;height:24px;border-radius:50%;background:var(--rnd-accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+        .rank-num.top3{background:linear-gradient(135deg,#7c3aed,#2563eb);}
+        .rank-info{flex:1;min-width:0;}
+        .rank-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .rank-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+        .rank-bar-wrap{flex:1;background:var(--border);border-radius:4px;height:6px;overflow:hidden;}
+        .rank-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,#7c3aed,#2563eb);}
+        .rank-val{font-size:12px;font-weight:700;color:var(--rnd-accent);white-space:nowrap;text-align:right;min-width:60px;}
+
+        /* Progress bar table */
+        .progress-bar-wrap{display:flex;align-items:center;gap:8px;}
+        .progress-bar{height:6px;border-radius:3px;background:linear-gradient(90deg,#7c3aed,#2563eb);flex-shrink:0;}
+        .progress-bg{flex:1;background:var(--border);border-radius:3px;height:6px;overflow:hidden;}
+
+        /* Loading */
+        #loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:14px;}
+        .spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--rnd-accent);border-radius:50%;animation:spin .8s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+        .loading-text{color:var(--text3);font-size:14px;}
+
+        /* Stat banner */
+        .stat-banner{background:linear-gradient(135deg,#7c3aed 0%,#2563eb 100%);border-radius:var(--radius);padding:24px 28px;color:#fff;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(124,58,237,.25);}
+        .stat-banner-left h2{font-size:18px;font-weight:700;margin-bottom:4px;}
+        .stat-banner-left p{font-size:12px;opacity:.8;}
+        .stat-banner-stats{display:flex;gap:32px;}
+        .stat-banner-item{text-align:center;}
+        .stat-banner-val{font-size:22px;font-weight:700;}
+        .stat-banner-label{font-size:10px;opacity:.75;margin-top:2px;}
+
+        /* Section title */
+        .section-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+        .section-title::before{content:'';display:inline-block;width:3px;height:15px;background:var(--rnd-accent);border-radius:2px;}
+
+        @media(max-width:900px){
+            .kpi-row{grid-template-columns:repeat(2,1fr);}
+            .charts-grid{grid-template-columns:1fr;}
+            .dashboard-grid{grid-template-columns:1fr;}
+            .stat-banner{flex-direction:column;gap:16px;}
+        }
+    </style>
+</head>
+<body>
+<div id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">R&D 예산 데이터 불러오는 중...</div>
+</div>
+
+<header>
+    <div class="header-inner">
+        <div class="logo">
+            <div class="logo-icon">🔬</div>
+            <div>
+                <div class="logo-text">연구개발(R&D) 예산 현황</div>
+                <div class="logo-sub">2026년 정부 예산안 · R&D 세부사업 분석</div>
+            </div>
+        </div>
+        <a href="index.html" class="back-btn">← 전체 예산으로 돌아가기</a>
+    </div>
+</header>
+
+<div class="tab-bar">
+    <div class="tab-bar-inner">
+        <button class="tab-btn active" onclick="switchTab('dashboard')">📊 현황판</button>
+        <button class="tab-btn" onclick="switchTab('field')">🔬 분야별 현황</button>
+        <button class="tab-btn" onclick="switchTab('ministry')">🏛 부처별 현황</button>
+        <button class="tab-btn" onclick="switchTab('list')">📄 사업 목록</button>
+    </div>
+</div>
+
+<div class="main">
+
+    <!-- ===== 현황판 ===== -->
+    <div class="tab-panel active" id="panel-dashboard">
+        <div class="stat-banner">
+            <div class="stat-banner-left">
+                <h2>🔬 2026년 R&D 예산 종합 현황</h2>
+                <p>세부사업명에 "R&D"가 포함된 사업을 대상으로 분석한 결과입니다.</p>
+            </div>
+            <div class="stat-banner-stats">
+                <div class="stat-banner-item">
+                    <div class="stat-banner-val" id="banner-total">-</div>
+                    <div class="stat-banner-label">총 R&D 예산 (억원)</div>
+                </div>
+                <div class="stat-banner-item">
+                    <div class="stat-banner-val" id="banner-count">-</div>
+                    <div class="stat-banner-label">총 사업 수</div>
+                </div>
+                <div class="stat-banner-item">
+                    <div class="stat-banner-val" id="banner-ministry">-</div>
+                    <div class="stat-banner-label">참여 부처 수</div>
+                </div>
+                <div class="stat-banner-item">
+                    <div class="stat-banner-val" id="banner-field">-</div>
+                    <div class="stat-banner-label">관련 분야 수</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="kpi-row" id="dashboard-kpi"></div>
+
+        <div class="dashboard-grid">
+            <div class="chart-card">
+                <div class="chart-title"><span class="chart-title-dot"></span>분야별 R&D 예산 비중</div>
+                <div class="chart-wrap"><canvas id="chart-dash-field-pie"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title"><span class="chart-title-dot"></span>부처별 R&D 예산 비중</div>
+                <div class="chart-wrap"><canvas id="chart-dash-ministry-pie"></canvas></div>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-title"><span class="chart-title-dot"></span>부처별 R&D 예산 순위</div>
+            <div class="chart-wrap tall"><canvas id="chart-dash-ministry-bar"></canvas></div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">📌 상위 R&D 사업 Top 10</div>
+                </div>
+                <div class="table-wrap">
+                    <table id="top10-table">
+                        <thead><tr>
+                            <th style="width:32px">#</th>
+                            <th>세부사업명</th>
+                            <th>부처</th>
+                            <th style="text-align:right">예산(백만원)</th>
+                        </tr></thead>
+                        <tbody id="top10-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title"><span class="chart-title-dot"></span>분야별 사업 수</div>
+                <div class="chart-wrap"><canvas id="chart-dash-field-count"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 분야별 현황 ===== -->
+    <div class="tab-panel" id="panel-field">
+        <div class="kpi-row" id="field-kpi-row"></div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-title"><span class="chart-title-dot"></span>분야별 R&D 예산 (억원)</div>
+                <div class="chart-wrap tall"><canvas id="chart-field-bar"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title"><span class="chart-title-dot"></span>분야별 비중 (도넛 차트)</div>
+                <div class="chart-wrap tall"><canvas id="chart-field-donut"></canvas></div>
+            </div>
+        </div>
+        <div class="table-card">
+            <div class="table-header">
+                <div class="table-title">분야별 R&D 예산 상세</div>
+                <div class="table-meta"><span class="badge badge-purple" id="field-table-count"></span></div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr>
+                        <th>분야</th>
+                        <th style="text-align:right">예산 (백만원)</th>
+                        <th style="text-align:right">예산 (억원)</th>
+                        <th style="text-align:right">비중</th>
+                        <th>사업 수</th>
+                        <th>비율 막대</th>
+                    </tr></thead>
+                    <tbody id="field-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="table-card">
+            <div class="table-header">
+                <div class="table-title">분야별 세부사업 목록</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr>
+                        <th>분야</th>
+                        <th>세부사업명</th>
+                        <th>부처</th>
+                        <th style="text-align:right">예산 (백만원)</th>
+                    </tr></thead>
+                    <tbody id="field-detail-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 부처별 현황 ===== -->
+    <div class="tab-panel" id="panel-ministry">
+        <div class="chart-card wide">
+            <div class="chart-title"><span class="chart-title-dot"></span>부처별 R&D 예산 (억원)</div>
+            <div class="chart-wrap tall"><canvas id="chart-ministry-bar"></canvas></div>
+        </div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-title"><span class="chart-title-dot"></span>부처별 예산 비중</div>
+                <div class="chart-wrap"><canvas id="chart-ministry-pie"></canvas></div>
+            </div>
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">부처별 R&D 예산 순위</div>
+                    <div class="table-meta"><span class="badge badge-purple" id="ministry-table-count"></span></div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr>
+                            <th>#</th>
+                            <th>부처</th>
+                            <th style="text-align:right">예산 (백만원)</th>
+                            <th style="text-align:right">비중</th>
+                            <th>사업 수</th>
+                            <th>비율</th>
+                        </tr></thead>
+                        <tbody id="ministry-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="table-card">
+            <div class="table-header">
+                <div class="table-title">부처별 세부사업 목록</div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr>
+                        <th>부처</th>
+                        <th>세부사업명</th>
+                        <th>분야</th>
+                        <th style="text-align:right">예산 (백만원)</th>
+                    </tr></thead>
+                    <tbody id="ministry-detail-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 사업 목록 ===== -->
+    <div class="tab-panel" id="panel-list">
+        <div style="display:flex;gap:10px;align-items:center;">
+            <input type="text" id="search-input" placeholder="사업명, 부처, 분야 검색..." style="flex:1;padding:10px 14px;border:1px solid var(--border2);border-radius:8px;font-size:13px;outline:none;font-family:var(--font);" oninput="filterList()">
+            <select id="field-filter" onchange="filterList()" style="padding:10px 12px;border:1px solid var(--border2);border-radius:8px;font-size:12px;outline:none;font-family:var(--font);background:var(--surface2);">
+                <option value="">전체 분야</option>
+            </select>
+            <select id="ministry-filter" onchange="filterList()" style="padding:10px 12px;border:1px solid var(--border2);border-radius:8px;font-size:12px;outline:none;font-family:var(--font);background:var(--surface2);">
+                <option value="">전체 부처</option>
+            </select>
+        </div>
+        <div class="table-card">
+            <div class="table-header">
+                <div class="table-title">R&D 세부사업 전체 목록</div>
+                <div class="table-meta"><span class="badge badge-purple" id="list-count"></span></div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr>
+                        <th>#</th>
+                        <th>세부사업명</th>
+                        <th>분야</th>
+                        <th>부처</th>
+                        <th>프로그램</th>
+                        <th style="text-align:right">예산 (백만원)</th>
+                    </tr></thead>
+                    <tbody id="list-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const COLORS = [
+    '#7c3aed','#2563eb','#059669','#d97706','#dc2626',
+    '#0d9488','#db2777','#ea580c','#4338ca','#0891b2',
+    '#65a30d','#9333ea','#16a34a','#b45309','#0369a1'
+];
+const FIELD_CHIPS = {
+    '산업·중소기업및에너지':'chip-purple','과학기술':'chip-blue',
+    '교통및물류':'chip-teal','공공질서및안전':'chip-orange',
+    '농림수산':'chip-green','일반·지방행정':'chip-gray','통일·외교':'chip-red'
+};
+
+let allData = [];
+let charts = {};
+
+function fmt(n) { return Number(n).toLocaleString('ko-KR'); }
+function fmtBillion(n) { return (n / 10000).toFixed(1); }
+
+async function init() {
+    const res = await fetch('rnd_budget.json');
+    allData = await res.json();
+    allData.sort((a,b) => b.budget - a.budget);
+    document.getElementById('loading').style.display = 'none';
+    buildDashboard();
+    buildField();
+    buildMinistry();
+    buildList();
+}
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        if (b.getAttribute('onclick') === `switchTab('${tab}')`) b.classList.add('active');
+    });
+}
+
+// ===== DASHBOARD =====
+function buildDashboard() {
+    const total = allData.reduce((s, d) => s + d.budget, 0);
+    const ministries = [...new Set(allData.map(d => d.ministry))];
+    const fields = [...new Set(allData.map(d => d.field))];
+
+    document.getElementById('banner-total').textContent = fmtBillion(total) + '억';
+    document.getElementById('banner-count').textContent = allData.length;
+    document.getElementById('banner-ministry').textContent = ministries.length;
+    document.getElementById('banner-field').textContent = fields.length;
+
+    // KPI cards
+    const topMinistry = Object.entries(groupBy(allData, 'ministry', 'budget'))
+        .sort((a,b) => b[1] - a[1])[0];
+    const topField = Object.entries(groupBy(allData, 'field', 'budget'))
+        .sort((a,b) => b[1] - a[1])[0];
+
+    document.getElementById('dashboard-kpi').innerHTML = `
+        <div class="kpi-card purple">
+            <div class="kpi-label">총 R&D 예산</div>
+            <div class="kpi-value">${fmtBillion(total)}<span class="kpi-unit">억원</span></div>
+            <div class="kpi-sub">${fmt(total)} 백만원</div>
+        </div>
+        <div class="kpi-card blue">
+            <div class="kpi-label">총 R&D 사업 수</div>
+            <div class="kpi-value">${allData.length}<span class="kpi-unit">건</span></div>
+            <div class="kpi-sub">${ministries.length}개 부처 · ${fields.length}개 분야</div>
+        </div>
+        <div class="kpi-card green">
+            <div class="kpi-label">최대 예산 부처</div>
+            <div class="kpi-value" style="font-size:16px">${topMinistry[0]}</div>
+            <div class="kpi-sub">${fmtBillion(topMinistry[1])}억원 (${(topMinistry[1]/total*100).toFixed(1)}%)</div>
+        </div>
+        <div class="kpi-card orange">
+            <div class="kpi-label">최대 예산 분야</div>
+            <div class="kpi-value" style="font-size:14px">${topField[0]}</div>
+            <div class="kpi-sub">${fmtBillion(topField[1])}억원 (${(topField[1]/total*100).toFixed(1)}%)</div>
+        </div>
+    `;
+
+    // Field pie
+    const fieldMap = groupBy(allData, 'field', 'budget');
+    const fieldEntries = Object.entries(fieldMap).sort((a,b) => b[1]-a[1]);
+    makeChart('chart-dash-field-pie', 'pie', fieldEntries.map(e=>e[0]), fieldEntries.map(e=>e[1]), {cutout:'0%'});
+
+    // Ministry pie
+    const minMap = groupBy(allData, 'ministry', 'budget');
+    const minEntries = Object.entries(minMap).sort((a,b) => b[1]-a[1]);
+    makeChart('chart-dash-ministry-pie', 'doughnut', minEntries.map(e=>e[0]), minEntries.map(e=>e[1]), {cutout:'55%'});
+
+    // Ministry bar
+    makeChart('chart-dash-ministry-bar', 'bar', minEntries.map(e=>e[0]), minEntries.map(e=>e[1]/10000), {
+        horizontal: false,
+        label: '예산(억원)',
+        color: '#7c3aed'
+    });
+
+    // Top 10 table
+    const tbody = document.getElementById('top10-tbody');
+    allData.slice(0, 10).forEach((d, i) => {
+        tbody.innerHTML += `<tr>
+            <td><span style="font-size:11px;font-weight:700;color:${i<3?'#7c3aed':'var(--text4)'}">${i+1}</span></td>
+            <td class="td-name">${d.name}</td>
+            <td><span class="chip ${FIELD_CHIPS[d.ministry]||'chip-gray'}">${d.ministry}</span></td>
+            <td class="td-budget">${fmt(d.budget)}</td>
+        </tr>`;
+    });
+
+    // Field count bar
+    const fieldCount = {};
+    allData.forEach(d => { fieldCount[d.field] = (fieldCount[d.field]||0)+1; });
+    const fcEntries = Object.entries(fieldCount).sort((a,b)=>b[1]-a[1]);
+    makeChart('chart-dash-field-count', 'bar', fcEntries.map(e=>e[0]), fcEntries.map(e=>e[1]), {
+        horizontal: false, label: '사업 수', color: '#2563eb', isCount: true
+    });
+}
+
+// ===== FIELD =====
+function buildField() {
+    const total = allData.reduce((s, d) => s + d.budget, 0);
+    const fieldMap = groupBy(allData, 'field', 'budget');
+    const fieldCount = {};
+    allData.forEach(d => { fieldCount[d.field] = (fieldCount[d.field]||0)+1; });
+    const entries = Object.entries(fieldMap).sort((a,b) => b[1]-a[1]);
+
+    // KPI cards per field
+    const kpiRow = document.getElementById('field-kpi-row');
+    entries.forEach((e, i) => {
+        const [field, budget] = e;
+        kpiRow.innerHTML += `
+            <div class="kpi-card ${['purple','blue','green','orange','teal','red','yellow'][i%7]}">
+                <div class="kpi-label">${field}</div>
+                <div class="kpi-value">${fmtBillion(budget)}<span class="kpi-unit">억원</span></div>
+                <div class="kpi-sub">${fieldCount[field]}건 · ${(budget/total*100).toFixed(1)}%</div>
+            </div>`;
+    });
+    document.getElementById('field-table-count').textContent = entries.length + '개 분야';
+
+    // Bar chart
+    makeChart('chart-field-bar', 'bar', entries.map(e=>e[0]), entries.map(e=>e[1]/10000), {
+        horizontal: false, label: '예산(억원)', color: '#7c3aed'
+    });
+    // Donut chart
+    makeChart('chart-field-donut', 'doughnut', entries.map(e=>e[0]), entries.map(e=>e[1]), {cutout:'55%'});
+
+    // Table
+    const tbody = document.getElementById('field-tbody');
+    entries.forEach(([field, budget]) => {
+        const pct = (budget / total * 100).toFixed(1);
+        const barW = Math.round(budget / entries[0][1] * 100);
+        tbody.innerHTML += `<tr>
+            <td><span class="chip ${FIELD_CHIPS[field]||'chip-gray'}">${field}</span></td>
+            <td class="td-budget">${fmt(budget)}</td>
+            <td class="td-budget">${fmtBillion(budget)}</td>
+            <td style="text-align:right;font-weight:600;color:var(--rnd-accent)">${pct}%</td>
+            <td>${fieldCount[field]}건</td>
+            <td><div class="progress-bar-wrap">
+                <div class="progress-bg"><div class="progress-bar" style="width:${barW}%"></div></div>
+            </div></td>
+        </tr>`;
+    });
+
+    // Detail table
+    const dtbody = document.getElementById('field-detail-tbody');
+    const sorted = [...allData].sort((a,b) => {
+        if (a.field < b.field) return -1;
+        if (a.field > b.field) return 1;
+        return b.budget - a.budget;
+    });
+    sorted.forEach(d => {
+        dtbody.innerHTML += `<tr>
+            <td><span class="chip ${FIELD_CHIPS[d.field]||'chip-gray'}">${d.field}</span></td>
+            <td class="td-name">${d.name}</td>
+            <td>${d.ministry}</td>
+            <td class="td-budget">${fmt(d.budget)}</td>
+        </tr>`;
+    });
+}
+
+// ===== MINISTRY =====
+function buildMinistry() {
+    const total = allData.reduce((s, d) => s + d.budget, 0);
+    const minMap = groupBy(allData, 'ministry', 'budget');
+    const minCount = {};
+    allData.forEach(d => { minCount[d.ministry] = (minCount[d.ministry]||0)+1; });
+    const entries = Object.entries(minMap).sort((a,b) => b[1]-a[1]);
+
+    document.getElementById('ministry-table-count').textContent = entries.length + '개 부처';
+
+    makeChart('chart-ministry-bar', 'bar', entries.map(e=>e[0]), entries.map(e=>e[1]/10000), {
+        horizontal: false, label: '예산(억원)', color: '#7c3aed'
+    });
+    makeChart('chart-ministry-pie', 'doughnut', entries.map(e=>e[0]), entries.map(e=>e[1]), {cutout:'55%'});
+
+    const tbody = document.getElementById('ministry-tbody');
+    entries.forEach(([min, budget], i) => {
+        const pct = (budget / total * 100).toFixed(1);
+        const barW = Math.round(budget / entries[0][1] * 100);
+        tbody.innerHTML += `<tr>
+            <td style="font-weight:700;color:${i<3?'#7c3aed':'var(--text4)'}">${i+1}</td>
+            <td style="font-weight:600">${min}</td>
+            <td class="td-budget">${fmt(budget)}</td>
+            <td style="text-align:right;font-weight:600;color:var(--rnd-accent)">${pct}%</td>
+            <td>${minCount[min]}건</td>
+            <td style="min-width:80px"><div class="progress-bar-wrap">
+                <div class="progress-bg"><div class="progress-bar" style="width:${barW}%"></div></div>
+            </div></td>
+        </tr>`;
+    });
+
+    // Detail table
+    const dtbody = document.getElementById('ministry-detail-tbody');
+    const sorted = [...allData].sort((a,b) => {
+        if (a.ministry < b.ministry) return -1;
+        if (a.ministry > b.ministry) return 1;
+        return b.budget - a.budget;
+    });
+    sorted.forEach(d => {
+        dtbody.innerHTML += `<tr>
+            <td style="font-weight:600">${d.ministry}</td>
+            <td class="td-name">${d.name}</td>
+            <td><span class="chip ${FIELD_CHIPS[d.field]||'chip-gray'}">${d.field}</span></td>
+            <td class="td-budget">${fmt(d.budget)}</td>
+        </tr>`;
+    });
+}
+
+// ===== LIST =====
+function buildList() {
+    const fields = [...new Set(allData.map(d => d.field))].sort();
+    const ministries = [...new Set(allData.map(d => d.ministry))].sort();
+    const fSel = document.getElementById('field-filter');
+    const mSel = document.getElementById('ministry-filter');
+    fields.forEach(f => { fSel.innerHTML += `<option value="${f}">${f}</option>`; });
+    ministries.forEach(m => { mSel.innerHTML += `<option value="${m}">${m}</option>`; });
+    filterList();
+}
+
+function filterList() {
+    const query = document.getElementById('search-input').value.toLowerCase();
+    const fieldFilter = document.getElementById('field-filter').value;
+    const ministryFilter = document.getElementById('ministry-filter').value;
+    const filtered = allData.filter(d => {
+        const matchQ = !query || d.name.toLowerCase().includes(query) || d.ministry.toLowerCase().includes(query) || d.field.toLowerCase().includes(query);
+        const matchF = !fieldFilter || d.field === fieldFilter;
+        const matchM = !ministryFilter || d.ministry === ministryFilter;
+        return matchQ && matchF && matchM;
+    });
+    document.getElementById('list-count').textContent = filtered.length + '건';
+    const tbody = document.getElementById('list-tbody');
+    tbody.innerHTML = '';
+    filtered.sort((a,b) => b.budget - a.budget).forEach((d, i) => {
+        tbody.innerHTML += `<tr>
+            <td style="color:var(--text4);font-size:11px">${i+1}</td>
+            <td class="td-name">${d.name}</td>
+            <td><span class="chip ${FIELD_CHIPS[d.field]||'chip-gray'}">${d.field}</span></td>
+            <td>${d.ministry}</td>
+            <td style="color:var(--text3);font-size:11px">${d.program||'-'}</td>
+            <td class="td-budget">${fmt(d.budget)}</td>
+        </tr>`;
+    });
+}
+
+// ===== HELPERS =====
+function groupBy(data, key, sumKey) {
+    const result = {};
+    data.forEach(d => {
+        result[d[key]] = (result[d[key]] || 0) + d[sumKey];
+    });
+    return result;
+}
+
+function makeChart(id, type, labels, values, opts={}) {
+    if (charts[id]) { charts[id].destroy(); }
+    const ctx = document.getElementById(id).getContext('2d');
+    const isPie = type === 'pie' || type === 'doughnut';
+    const colors = labels.map((_, i) => COLORS[i % COLORS.length]);
+
+    charts[id] = new Chart(ctx, {
+        type: type,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: opts.label || '예산',
+                data: values,
+                backgroundColor: isPie ? colors : (opts.color || colors),
+                borderColor: isPie ? '#fff' : 'transparent',
+                borderWidth: isPie ? 2 : 0,
+                borderRadius: isPie ? 0 : 5,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: opts.horizontal ? 'y' : 'x',
+            cutout: opts.cutout || undefined,
+            plugins: {
+                legend: { display: isPie, position: 'right', labels: { font: { size: 11, family: "'Noto Sans KR'" }, padding: 10, boxWidth: 12 } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const v = ctx.parsed.y ?? ctx.parsed.x ?? ctx.parsed ?? 0;
+                            if (isPie) {
+                                const total = ctx.dataset.data.reduce((s,n)=>s+n,0);
+                                return ` ${fmt(Math.round(v))} 백만원 (${(v/total*100).toFixed(1)}%)`;
+                            }
+                            return opts.isCount ? ` ${Math.round(v)}건` : ` ${Number(v).toFixed(1)}억원`;
+                        }
+                    }
+                }
+            },
+            scales: isPie ? {} : {
+                x: { grid:{color:'rgba(0,0,0,.04)'}, ticks:{font:{size:11,family:"'Noto Sans KR'"}} },
+                y: { grid:{color:'rgba(0,0,0,.04)'}, ticks:{font:{size:11,family:"'Noto Sans KR'"}}, beginAtZero:true }
+            }
+        }
+    });
+}
+
+init();
+</script>
+</body>
+</html>

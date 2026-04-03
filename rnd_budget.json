@@ -1,0 +1,1286 @@
+[
+  {
+    "id": 115,
+    "name": "관세행정연구개발(R&D)",
+    "ministry": "관세청",
+    "field": "일반·지방행정",
+    "subfield": "재정·금융",
+    "program": "관세행정 지능정보화",
+    "main_account": "일반회계",
+    "budget": 4943,
+    "details": [
+      {
+        "name": "관세행정 현장맞춤형 기술개발 2.0(R&D)",
+        "budget": 3267,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "불법 마약류 대응을 위한 현장 기술개발(R&D)",
+        "budget": 1500,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "스마트 세관 기술지원(R&D)",
+        "budget": 176,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 453,
+    "name": "정책연구개발(R&D)",
+    "ministry": "경찰청",
+    "field": "공공질서및안전",
+    "subfield": "경찰",
+    "program": "과학치안활성화",
+    "main_account": "일반회계",
+    "budget": 68212,
+    "details": [
+      {
+        "name": "치안현장 맞춤형 연구개발(폴리스랩2.0)(R&D)(경찰청)",
+        "budget": 2907,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "과학적 범죄수사 고도화 기술 개발(R&D)(경찰청)",
+        "budget": 3068,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "자율주행 기술개발 혁신사업(R&D)(경찰청)",
+        "budget": 14454,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "경찰장비 개선(R&D)",
+        "budget": 2548,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "과학치안 공공연구성과 실용화 촉진 시범사업(R&D)",
+        "budget": 1440,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "사회적 약자 보호 강화기술 개발(R&D)",
+        "budget": 4483,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "사이버수사 지원기술 개발(R&D)",
+        "budget": 8736,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "미래치안 도전기술 개발(R&D)",
+        "budget": 1383,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "경찰건강 스마트관리(R&D)",
+        "budget": 6562,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "불법 마약류 대응을 위한 현장기술 개발(R&D)",
+        "budget": 4932,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "과학기술 기반 군중밀집 관리 기술 개발(R&D)",
+        "budget": 1976,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "치안현장맞춤형연구개발(폴리스랩3.0)(R&D)",
+        "budget": 2494,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "차세대지능형순찰플랫폼개발(R&D)",
+        "budget": 3465,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "사이버범죄수사단서통합분석및추론시스템개발(R&D)",
+        "budget": 6136,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "경찰작전능력향상기술개발(R&D)",
+        "budget": 1248,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "치안데이터활용기술개발(R&D)",
+        "budget": 1560,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "치안신산업핵심기술사업화지원(R&D)",
+        "budget": 820,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 531,
+    "name": "통일업무 R&D",
+    "ministry": "통일부",
+    "field": "통일·외교",
+    "subfield": "통일",
+    "program": "통일행정지원",
+    "main_account": "일반회계",
+    "budget": 438,
+    "details": [
+      {
+        "name": "정책연구개발",
+        "budget": 438,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 584,
+    "name": "외교정책연구(R&D)",
+    "ministry": "외교부",
+    "field": "통일·외교",
+    "subfield": "외교·통상",
+    "program": "외교 행정지원",
+    "main_account": "일반회계",
+    "budget": 338,
+    "details": [
+      {
+        "name": "정책연구개발",
+        "budget": 338,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1095,
+    "name": "민간연구개발지원(R&D,수입대체경비)",
+    "ministry": "농촌진흥청",
+    "field": "농림수산",
+    "subfield": "농업·농촌",
+    "program": "농업기초기반 및 실용화 기술개발",
+    "main_account": "일반회계",
+    "budget": 25,
+    "details": [
+      {
+        "name": "민간연구개발지원(R&D)",
+        "budget": 25,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1113,
+    "name": "검역검사(R&D)",
+    "ministry": "농림축산식품부",
+    "field": "농림수산",
+    "subfield": "농업·농촌",
+    "program": "농림축산검역검사",
+    "main_account": "일반회계",
+    "budget": 44778,
+    "details": [
+      {
+        "name": "농림축산검역검사기술개발(R&D)",
+        "budget": 44778,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1288,
+    "name": "기술개발지원(R&D)",
+    "ministry": "중소벤처기업부",
+    "field": "산업·중소기업및에너지",
+    "subfield": "중소기업및소상공인육성",
+    "program": "중소기업기술개발지원",
+    "main_account": "일반회계",
+    "budget": 1960636,
+    "details": [
+      {
+        "name": "중소기업기술혁신개발(R&D)",
+        "budget": 494242,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "창업성장기술개발(R&D)",
+        "budget": 786419,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "스마트 제조혁신 기술개발사업(R&D)",
+        "budget": 23326,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "중소기업기술정보진흥원 기획평가관리비(일반)(R&D)",
+        "budget": 39803,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "디지털기반중소제조산재예방기술개발(R&D)",
+        "budget": 7700,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "중소기업 수출 핵심품목 탄소감축 기술개발(R&D)",
+        "budget": 5000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "민관공동기술사업화(R&D)",
+        "budget": 129912,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "투·융자연계기술개발(R&D)",
+        "budget": 457041,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "표준공정 기반 공정최적화 기술개발(R&D)",
+        "budget": 3000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "중소제조 특화 Multi AI Agent개발(R&D)",
+        "budget": 3600,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "중소기업기술혁신개발(R&D)",
+        "budget": 7275,
+        "account": "소재·부품·장비산업경쟁력강화및공급망안정화특별회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "중소기업기술정보진흥원 기획평가관리비(소특)(R&D)",
+        "budget": 3318,
+        "account": "소재·부품·장비산업경쟁력강화및공급망안정화특별회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1301,
+    "name": "기술개발인력지원(R&D)",
+    "ministry": "중소벤처기업부",
+    "field": "산업·중소기업및에너지",
+    "subfield": "중소기업및소상공인육성",
+    "program": "중소기업인력지원",
+    "main_account": "일반회계",
+    "budget": 34065,
+    "details": [
+      {
+        "name": "중소기업연구인력지원(R&D)",
+        "budget": 34065,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1307,
+    "name": "R&D 효율성제고를위한 특허정보 활용강화",
+    "ministry": "지식재산처",
+    "field": "산업·중소기업및에너지",
+    "subfield": "지식재산일반",
+    "program": "지식재산 창출기반 강화",
+    "main_account": "일반회계",
+    "budget": 68180,
+    "details": [
+      {
+        "name": "특허기술조사분석(R&D)",
+        "budget": 18477,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "IP-R&D 전략지원(R&D)",
+        "budget": 32236,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "표준특허 창출지원(R&D)",
+        "budget": 7467,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "지식재산 기반 기술사업화 전략지원(R&D)",
+        "budget": 10000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1336,
+    "name": "해양자원이용기술개발(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양산업육성및영토관리",
+    "main_account": "일반회계",
+    "budget": 10241,
+    "details": [
+      {
+        "name": "심해저 광물자원 기술개발(R&D)",
+        "budget": 8141,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양자원 탐사를 위한 무인체계 기술개발(R&D)",
+        "budget": 2100,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1337,
+    "name": "연구장비개발 및 인프라구축(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양산업육성및영토관리",
+    "main_account": "일반회계",
+    "budget": 91834,
+    "details": [
+      {
+        "name": "관할해역 첨단 해양과학기지 구축 및 융합연구(R&D)",
+        "budget": 6701,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해저공간 창출 및 활용 기술개발(R&D)",
+        "budget": 6560,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "차세대 쇄빙연구선 건조사업(R&D)",
+        "budget": 61079,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "천리안 2B호 산출물 정확도 향상 연구(R&D)",
+        "budget": 4677,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "고품질준실시간해양그리드데이터서비스체계개발(R&D)",
+        "budget": 3067,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "천해용 수중 모빌리티 기술 개발(R&D)",
+        "budget": 3350,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "북극新항로 개척을 위한 친환경 쇄빙컨테이너선 개발(R&D)",
+        "budget": 3700,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양연구선(온누리호) 대체건조사업(R&D)",
+        "budget": 2700,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1338,
+    "name": "극지및대양과학연구(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양산업육성및영토관리",
+    "main_account": "일반회계",
+    "budget": 26351,
+    "details": [
+      {
+        "name": "극지 해양환경 및 해저조사 연구사업(R&D)",
+        "budget": 7770,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "쿠로시오해류로인한한반도해양위기대응기술개발(R&D)",
+        "budget": 2500,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "급격한 남극빙상 용융에 따른 근미래 전지구 해수면 상승 예측기술개발(R&D)",
+        "budget": 4541,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "기후변화예측력향상을위한대양연구(R&D)",
+        "budget": 5880,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "남극해 급격한 온난화 대응 남극 해빙 예측 기술 개발(R&D)",
+        "budget": 3360,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "아열대 해양환경 적응 시나리오 개발  대응책 및 활용 체계 구축(R&D)",
+        "budget": 2300,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1339,
+    "name": "해양수산생명공학기술개발(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양산업육성및영토관리",
+    "main_account": "일반회계",
+    "budget": 32283,
+    "details": [
+      {
+        "name": "국가생명연구자원선진화(해수부)(R&D)",
+        "budget": 6468,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "빅데이터 기반 해양 바이러스 제어 및 마린바이오틱스 개발(R&D)",
+        "budget": 3900,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양바이오 산업소재 국산화 기술개발(R&D)",
+        "budget": 4965,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양수산부산물 바이오 소재화 기술개발(R&D)",
+        "budget": 3000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양 마이크로바이옴 기반 생태환경 관리기술 개발(R&D)",
+        "budget": 1700,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양생물독 생산 및 기능성 활용 기술개발(R&D)",
+        "budget": 5300,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양 글라이칸 활용 맞춤형 케어소재 산업화(R&D)",
+        "budget": 2100,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양생물 유래 바이오소재를 활용한 노화 극복 기술개발(R&D)",
+        "budget": 4850,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1340,
+    "name": "해양기술역량강화(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양산업육성및영토관리",
+    "main_account": "일반회계",
+    "budget": 17130,
+    "details": [
+      {
+        "name": "해양수산 과학기술 국제협력 고도화사업(R&D)",
+        "budget": 3000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양수산 딥테크 육성 기술개발(R&D)",
+        "budget": 8350,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양블루테크미래리더양성프로젝트(R&D)",
+        "budget": 5780,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1341,
+    "name": "해양수산산업진흥(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양산업육성및영토관리",
+    "main_account": "일반회계",
+    "budget": 53854,
+    "details": [
+      {
+        "name": "해양레저장비 및 안전기술 개발(R&D)",
+        "budget": 6130,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "머신러닝 기반 해저면 특성 분류 기술개발(R&D)",
+        "budget": 3170,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양 기후변화 진단 및 장기전망 연구(R&D)",
+        "budget": 4922,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양치유자원 효능 검증 및 활용 기술개발(R&D)",
+        "budget": 1080,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양무인시스템실증시험·평가기술개발(R&D)",
+        "budget": 10808,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해저활성단층 특성 규명 연구(R&D)",
+        "budget": 4400,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "갯벌 공간정보 변화 모니터링 기술개발(R&D)",
+        "budget": 2794,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "스마트선박용 수로정보 표준개발(R&D)",
+        "budget": 2400,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "(다부처)암호화사이버위협대응기술연구개발및실증(R&D)",
+        "budget": 2000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "용융염원자로(MSR)혁신기술개발(해수부)(R&D)",
+        "budget": 600,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "민군 활용 AI기반 융복합 해양데이터 분석기술 개발 및 보안플랫폼 구축(R&D)",
+        "budget": 3050,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "민군경 AI 기반 해양영상 융복합 분석기술 개발(R&D)",
+        "budget": 3500,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "관할해역 정밀 해양탐사 기술개발(R&D)",
+        "budget": 7000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양배터리 특화 데이터 허브 플랫폼 구축 기술 개발(R&D)",
+        "budget": 2000,
+        "account": "지역균형발전특별회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1344,
+    "name": "국토교통기술역량강화(R&D)",
+    "ministry": "국토교통부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "국토교통연구개발",
+    "main_account": "일반회계",
+    "budget": 31199,
+    "details": [
+      {
+        "name": "국토교통기술사업화를위한이어달리기사업(R&D)",
+        "budget": 8680,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "국토교통DNA플러스융합기술대학원육성사업(R&D)",
+        "budget": 6720,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "성과확산형국토교통국제협력연구개발사업(R&D)",
+        "budget": 5399,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "협력거점형국토교통국제협력연구개발사업(R&D)",
+        "budget": 6400,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "국토교통과학기술신진연구자지원사업(R&D)",
+        "budget": 2000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "지역단위재난위험도AI시뮬레이션기반재난안전관리기술개발(R&D)",
+        "budget": 2000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1346,
+    "name": "국토교통연구기획(R&D)",
+    "ministry": "국토교통부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "국토교통연구개발",
+    "main_account": "일반회계",
+    "budget": 25632,
+    "details": [
+      {
+        "name": "국토교통연구기획(R&D)",
+        "budget": 3400,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "국토교통연구개발운영지원사업(R&D)",
+        "budget": 8596,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "국토교통과학기술진흥원기획평가관리비(일반)(R&D)",
+        "budget": 13636,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1347,
+    "name": "건설기술혁신(R&D)",
+    "ministry": "국토교통부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "국토교통연구개발",
+    "main_account": "일반회계",
+    "budget": 59997,
+    "details": [
+      {
+        "name": "건축물화재확산방지및피난성능향상기술개발(R&D)",
+        "budget": 4000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "스마트+빌딩핵심기술개발(R&D)",
+        "budget": 5048,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "고층형ZEB3등급공동주택핵심기술개발(R&D)",
+        "budget": 7087,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "리튬기반배터리제조소및저장취급시설안전을위한기술개발(R&D)",
+        "budget": 500,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "건설 전주기 안전혁신 기술개발 사업(R&D)",
+        "budget": 43362,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1353,
+    "name": "해양수산환경 기술개발(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양수산연구개발",
+    "main_account": "일반회계",
+    "budget": 41708,
+    "details": [
+      {
+        "name": "해양위험유해물질(HNS)배출등관리기술개발(R&D)",
+        "budget": 7132,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양 미세플라스틱 오염 대응 및 관리기술개발(R&D)",
+        "budget": 5630,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양 유해물질 오염원 추적기법 개발(R&D)",
+        "budget": 3146,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양공간 디지털트윈 적용 및 활용 기술개발(R&D)",
+        "budget": 6000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양방사능오염사고대비신속탐지·예측기술개발(R&D)",
+        "budget": 7000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "CO2 수송-주입 복합기능선박 기술개발(R&D)",
+        "budget": 1800,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "공해생물다양성 보존(R&D)",
+        "budget": 1000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해저공간 관리체계 구축 핵심기술 개발(R&D)",
+        "budget": 1600,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "지능형 빅데이터 분석기반 해양환경누적영향평가 및 의사결정지원 기술개발(R&D)",
+        "budget": 2000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "탄소제로 수중데이터센터 표준모델 개발(R&D)",
+        "budget": 6400,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1354,
+    "name": "해양수산R&D역량강화(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양수산연구개발",
+    "main_account": "일반회계",
+    "budget": 25432,
+    "details": [
+      {
+        "name": "해양수산과학기술진흥원 운영지원(R&D)",
+        "budget": 7917,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양수산과학기술진흥원 기획평가관리(R&D)",
+        "budget": 17515,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1355,
+    "name": "수산연구개발(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양수산연구개발",
+    "main_account": "일반회계",
+    "budget": 27635,
+    "details": [
+      {
+        "name": "국제사회IUU어업 예방을 위한 원양어선전자모니터링기술개발(R&D)",
+        "budget": 5400,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "수산부산물산업활용성기술개발사업(R&D)",
+        "budget": 3325,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "수산업현장맞춤형기술고도화사업(R&D)",
+        "budget": 3260,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "지속가능한 우량김종자생산 및 육상양식기술개발(R&D)",
+        "budget": 7550,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양아쿠아포닉스기반 에너지절감형 육상양식시스템 구축 및 운용기술개발(R&D)",
+        "budget": 2800,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양수산 융합형 전문인력양성사업(R&D)",
+        "budget": 3700,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "양식생물 생물보안체계 구축을 위한 기술개발(R&D)",
+        "budget": 1600,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1356,
+    "name": "정책연구개발(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양수산연구개발",
+    "main_account": "일반회계",
+    "budget": 644,
+    "details": [
+      {
+        "name": "정책연구개발사업",
+        "budget": 644,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1357,
+    "name": "항만물류기술개발(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양수산연구개발",
+    "main_account": "일반회계",
+    "budget": 22144,
+    "details": [
+      {
+        "name": "순환적응형연안침식관리기술개발(R&D)",
+        "budget": 4000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "스마트항만기술산업경쟁력강화핵심기술개발(R&D)",
+        "budget": 9400,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "자율주행차 해상수출입서비스 기술개발(R&D)",
+        "budget": 1400,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "국제해양환경규제대응 친환경선박평형수처리 기술고도화 및 미세플라스틱 포집 기술 개발(R&D)",
+        "budget": 1000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "AI 완전자율운항선박 기술개발사업(R&D)",
+        "budget": 6344,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1358,
+    "name": "해양안전기술개발(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양수산연구개발",
+    "main_account": "교통시설특별회계",
+    "budget": 63497,
+    "details": [
+      {
+        "name": "한국형 연안재해 발생요인 예측기술 개발(R&D)",
+        "budget": 10635,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "한국형 위성항법시스템(KPS) 개발 사업(R&D)",
+        "budget": 22859,
+        "account": "교통시설특별회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해상물류 통신기술 검증 테스트베드 구축(R&D)",
+        "budget": 3200,
+        "account": "교통시설특별회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "국제표준기반지상파-위성통합VDES체계기술개발(R&D)",
+        "budget": 3012,
+        "account": "교통시설특별회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양디지털항로실증기술개발(R&D)",
+        "budget": 7406,
+        "account": "교통시설특별회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "선박배출온실가스(GHG)통합관리기술개발(R&D)",
+        "budget": 9315,
+        "account": "교통시설특별회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "지상파항법시스템고도화기술개발(R&D)",
+        "budget": 7070,
+        "account": "교통시설특별회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1404,
+    "name": "수자원연구개발(R&D)",
+    "ministry": "기후에너지환경부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "수자원정책 및 홍수관리",
+    "main_account": "일반회계",
+    "budget": 22380,
+    "details": [
+      {
+        "name": "미래변화 대응 수자원 안정성 확보 기술개발사업(R&D)",
+        "budget": 22380,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1521,
+    "name": "직할출연연구기관지원(R&D)",
+    "ministry": "원자력안전위원회",
+    "field": "과학기술",
+    "subfield": "과학기술연구지원",
+    "program": "출연연구기관지원",
+    "main_account": "일반회계",
+    "budget": 55182,
+    "details": [
+      {
+        "name": "한국원자력안전기술원 연구운영비 지원(R&D)",
+        "budget": 36453,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "한국원자력통제기술원 연구운영비 지원(R&D)",
+        "budget": 13775,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "한국원자력안전재단 운영비 지원(R&D)",
+        "budget": 3954,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "한국원자력안전기술원 시설 지원(R&D)",
+        "budget": 190,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "한국원자력통제기술원 시설 지원(R&D)",
+        "budget": 810,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1528,
+    "name": "동북아 R&D 허브 기반 구축",
+    "ministry": "과학기술정보통신부",
+    "field": "과학기술",
+    "subfield": "과학기술연구지원",
+    "program": "과학기술국제협력",
+    "main_account": "일반회계",
+    "budget": 45864,
+    "details": [
+      {
+        "name": "해외우수연구기관 협력허브구축(R&D)",
+        "budget": 30100,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "국제협력 네트워크 전략 강화 사업(R&D)",
+        "budget": 2250,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "유럽연합 다자연구혁신프로그램 참여 지원(R&D)",
+        "budget": 12514,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "환태평양 연구협력 이니셔티브 지원(R&D)",
+        "budget": 1000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1600,
+    "name": "원자력안전규제기술개발(R&D)",
+    "ministry": "원자력안전위원회",
+    "field": "과학기술",
+    "subfield": "과학기술연구개발",
+    "program": "원자력안전연구",
+    "main_account": "일반회계",
+    "budget": 15058,
+    "details": [
+      {
+        "name": "한국원자력안전재단 기획평가관리비(R&D)",
+        "budget": 943,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "해양환경 방사성핵종 분석기술 개발(R&D)",
+        "budget": 1730,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "원자력 안전규제 기초·기반기술 개발(R&D)",
+        "budget": 4785,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "주변국 원자력활동 대응기술 개발(R&D)",
+        "budget": 2000,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "원자력통제 규제기술 선진화(R&D)",
+        "budget": 5600,
+        "account": "일반회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1850,
+    "name": "정책연구개발(R&D)",
+    "ministry": "농림축산식품부",
+    "field": "농림수산",
+    "subfield": "농업·농촌",
+    "program": "농림축산식품행정지원",
+    "main_account": "농어촌구조개선특별회계",
+    "budget": 1405,
+    "details": [
+      {
+        "name": "정책연구개발사업",
+        "budget": 1405,
+        "account": "농어촌구조개선특별회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 1969,
+    "name": "산학연협력기술개발(지특, R&D)",
+    "ministry": "중소벤처기업부",
+    "field": "산업·중소기업및에너지",
+    "subfield": "중소기업및소상공인육성",
+    "program": "중소기업기술개발지원",
+    "main_account": "지역균형발전특별회계",
+    "budget": 47006,
+    "details": [
+      {
+        "name": "산학연CollaboR&D(R&D)",
+        "budget": 39420,
+        "account": "지역균형발전특별회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "중소기업기술정보진흥원 기획평가관리비(지특)(R&D)",
+        "budget": 7586,
+        "account": "지역균형발전특별회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 2038,
+    "name": "항만 및 물류기술개발(R&D)",
+    "ministry": "해양수산부",
+    "field": "교통및물류",
+    "subfield": "물류등기타",
+    "program": "해양수산연구개발",
+    "main_account": "교통시설특별회계",
+    "budget": 4960,
+    "details": [
+      {
+        "name": "수출입물류항만-내륙연계기술개발(R&D)",
+        "budget": 3340,
+        "account": "교통시설특별회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "LNG벙커링동시작업기술개발(R&D)",
+        "budget": 1220,
+        "account": "교통시설특별회계",
+        "expenditure": "일반지출"
+      },
+      {
+        "name": "화물차 중량정보 플랫폼 구축 및 육상-항만 연계 실증사업(R&D)",
+        "budget": 400,
+        "account": "교통시설특별회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  },
+  {
+    "id": 2100,
+    "name": "이공계 연구생활장려금(R&D)",
+    "ministry": "과학기술정보통신부",
+    "field": "과학기술",
+    "subfield": "과학기술인력및문화",
+    "program": "과학기술인력양성",
+    "main_account": "고등·평생교육지원특별회계",
+    "budget": 83043,
+    "details": [
+      {
+        "name": "이공계 연구생활장려금(R&D)",
+        "budget": 83043,
+        "account": "고등·평생교육지원특별회계",
+        "expenditure": "일반지출"
+      }
+    ]
+  }
+]
