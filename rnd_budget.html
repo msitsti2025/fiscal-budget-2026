@@ -172,7 +172,7 @@
             <div class="stat-banner-stats">
                 <div class="stat-banner-item">
                     <div class="stat-banner-val" id="banner-total">-</div>
-                    <div class="stat-banner-label">총 R&D 예산 (억원)</div>
+                    <div class="stat-banner-label">총 R&D 예산 (조원)</div>
                 </div>
                 <div class="stat-banner-item">
                     <div class="stat-banner-val" id="banner-count">-</div>
@@ -253,7 +253,7 @@
                 <table>
                     <thead><tr>
                         <th>분야</th>
-                        <th style="text-align:right">예산 (백만원)</th>
+                        <th style="text-align:right">예산 (천원)</th>
                         <th style="text-align:right">예산 (억원)</th>
                         <th style="text-align:right">비중</th>
                         <th>사업 수</th>
@@ -273,7 +273,7 @@
                         <th>분야</th>
                         <th>세부사업명</th>
                         <th>부처</th>
-                        <th style="text-align:right">예산 (백만원)</th>
+                        <th style="text-align:right">예산 (억원)</th>
                     </tr></thead>
                     <tbody id="field-detail-tbody"></tbody>
                 </table>
@@ -302,7 +302,7 @@
                         <thead><tr>
                             <th>#</th>
                             <th>부처</th>
-                            <th style="text-align:right">예산 (백만원)</th>
+                            <th style="text-align:right">예산 (억원)</th>
                             <th style="text-align:right">비중</th>
                             <th>사업 수</th>
                             <th>비율</th>
@@ -354,7 +354,7 @@
                         <th>분야</th>
                         <th>부처</th>
                         <th>프로그램</th>
-                        <th style="text-align:right">예산 (백만원)</th>
+                        <th style="text-align:right">예산 (억원)</th>
                     </tr></thead>
                     <tbody id="list-tbody"></tbody>
                 </table>
@@ -379,7 +379,9 @@ let allData = [];
 let charts = {};
 
 function fmt(n) { return Number(n).toLocaleString('ko-KR'); }
-function fmtBillion(n) { return (n / 10000).toFixed(1); }
+// 예산 단위: 천원 (원본 Excel)
+function fmtEok(n) { return (n / 100000).toFixed(1); }   // 천원 → 억원
+function fmtJo(n)  { return (n / 1000000000).toFixed(2); } // 천원 → 조원
 
 async function init() {
     const res = await fetch('rnd_budget.json');
@@ -407,7 +409,7 @@ function buildDashboard() {
     const ministries = [...new Set(allData.map(d => d.ministry))];
     const fields = [...new Set(allData.map(d => d.field))];
 
-    document.getElementById('banner-total').textContent = fmtBillion(total) + '억';
+    document.getElementById('banner-total').textContent = fmtJo(total) + '조';
     document.getElementById('banner-count').textContent = allData.length;
     document.getElementById('banner-ministry').textContent = ministries.length;
     document.getElementById('banner-field').textContent = fields.length;
@@ -421,8 +423,8 @@ function buildDashboard() {
     document.getElementById('dashboard-kpi').innerHTML = `
         <div class="kpi-card purple">
             <div class="kpi-label">총 R&D 예산</div>
-            <div class="kpi-value">${fmtBillion(total)}<span class="kpi-unit">억원</span></div>
-            <div class="kpi-sub">${fmt(total)} 백만원</div>
+            <div class="kpi-value">${fmtJo(total)}<span class="kpi-unit">조원</span></div>
+            <div class="kpi-sub">${fmt(total)} 천원</div>
         </div>
         <div class="kpi-card blue">
             <div class="kpi-label">총 R&D 사업 수</div>
@@ -432,12 +434,12 @@ function buildDashboard() {
         <div class="kpi-card green">
             <div class="kpi-label">최대 예산 부처</div>
             <div class="kpi-value" style="font-size:16px">${topMinistry[0]}</div>
-            <div class="kpi-sub">${fmtBillion(topMinistry[1])}억원 (${(topMinistry[1]/total*100).toFixed(1)}%)</div>
+            <div class="kpi-sub">${fmtEok(topMinistry[1])}억원 (${(topMinistry[1]/total*100).toFixed(1)}%)</div>
         </div>
         <div class="kpi-card orange">
             <div class="kpi-label">최대 예산 분야</div>
             <div class="kpi-value" style="font-size:14px">${topField[0]}</div>
-            <div class="kpi-sub">${fmtBillion(topField[1])}억원 (${(topField[1]/total*100).toFixed(1)}%)</div>
+            <div class="kpi-sub">${fmtEok(topField[1])}억원 (${(topField[1]/total*100).toFixed(1)}%)</div>
         </div>
     `;
 
@@ -452,7 +454,7 @@ function buildDashboard() {
     makeChart('chart-dash-ministry-pie', 'doughnut', minEntries.map(e=>e[0]), minEntries.map(e=>e[1]), {cutout:'55%'});
 
     // Ministry bar
-    makeChart('chart-dash-ministry-bar', 'bar', minEntries.map(e=>e[0]), minEntries.map(e=>e[1]/10000), {
+    makeChart('chart-dash-ministry-bar', 'bar', minEntries.map(e=>e[0]), minEntries.map(e=>e[1]/100000), {
         horizontal: false,
         label: '예산(억원)',
         color: '#7c3aed'
@@ -465,7 +467,7 @@ function buildDashboard() {
             <td><span style="font-size:11px;font-weight:700;color:${i<3?'#7c3aed':'var(--text4)'}">${i+1}</span></td>
             <td class="td-name">${d.name}</td>
             <td><span class="chip ${FIELD_CHIPS[d.ministry]||'chip-gray'}">${d.ministry}</span></td>
-            <td class="td-budget">${fmt(d.budget)}</td>
+            <td class="td-budget">${fmtEok(d.budget)}억</td>
         </tr>`;
     });
 
@@ -493,14 +495,14 @@ function buildField() {
         kpiRow.innerHTML += `
             <div class="kpi-card ${['purple','blue','green','orange','teal','red','yellow'][i%7]}">
                 <div class="kpi-label">${field}</div>
-                <div class="kpi-value">${fmtBillion(budget)}<span class="kpi-unit">억원</span></div>
+                <div class="kpi-value">${fmtEok(budget)}<span class="kpi-unit">억원</span></div>
                 <div class="kpi-sub">${fieldCount[field]}건 · ${(budget/total*100).toFixed(1)}%</div>
             </div>`;
     });
     document.getElementById('field-table-count').textContent = entries.length + '개 분야';
 
     // Bar chart
-    makeChart('chart-field-bar', 'bar', entries.map(e=>e[0]), entries.map(e=>e[1]/10000), {
+    makeChart('chart-field-bar', 'bar', entries.map(e=>e[0]), entries.map(e=>e[1]/100000), {
         horizontal: false, label: '예산(억원)', color: '#7c3aed'
     });
     // Donut chart
@@ -514,7 +516,7 @@ function buildField() {
         tbody.innerHTML += `<tr>
             <td><span class="chip ${FIELD_CHIPS[field]||'chip-gray'}">${field}</span></td>
             <td class="td-budget">${fmt(budget)}</td>
-            <td class="td-budget">${fmtBillion(budget)}</td>
+            <td class="td-budget">${fmtEok(budget)}</td>
             <td style="text-align:right;font-weight:600;color:var(--rnd-accent)">${pct}%</td>
             <td>${fieldCount[field]}건</td>
             <td><div class="progress-bar-wrap">
@@ -535,7 +537,7 @@ function buildField() {
             <td><span class="chip ${FIELD_CHIPS[d.field]||'chip-gray'}">${d.field}</span></td>
             <td class="td-name">${d.name}</td>
             <td>${d.ministry}</td>
-            <td class="td-budget">${fmt(d.budget)}</td>
+            <td class="td-budget">${fmtEok(d.budget)}억</td>
         </tr>`;
     });
 }
@@ -550,7 +552,7 @@ function buildMinistry() {
 
     document.getElementById('ministry-table-count').textContent = entries.length + '개 부처';
 
-    makeChart('chart-ministry-bar', 'bar', entries.map(e=>e[0]), entries.map(e=>e[1]/10000), {
+    makeChart('chart-ministry-bar', 'bar', entries.map(e=>e[0]), entries.map(e=>e[1]/100000), {
         horizontal: false, label: '예산(억원)', color: '#7c3aed'
     });
     makeChart('chart-ministry-pie', 'doughnut', entries.map(e=>e[0]), entries.map(e=>e[1]), {cutout:'55%'});
@@ -562,7 +564,7 @@ function buildMinistry() {
         tbody.innerHTML += `<tr>
             <td style="font-weight:700;color:${i<3?'#7c3aed':'var(--text4)'}">${i+1}</td>
             <td style="font-weight:600">${min}</td>
-            <td class="td-budget">${fmt(budget)}</td>
+            <td class="td-budget">${fmtEok(budget)}억</td>
             <td style="text-align:right;font-weight:600;color:var(--rnd-accent)">${pct}%</td>
             <td>${minCount[min]}건</td>
             <td style="min-width:80px"><div class="progress-bar-wrap">
@@ -583,7 +585,7 @@ function buildMinistry() {
             <td style="font-weight:600">${d.ministry}</td>
             <td class="td-name">${d.name}</td>
             <td><span class="chip ${FIELD_CHIPS[d.field]||'chip-gray'}">${d.field}</span></td>
-            <td class="td-budget">${fmt(d.budget)}</td>
+            <td class="td-budget">${fmtEok(d.budget)}억</td>
         </tr>`;
     });
 }
@@ -619,7 +621,7 @@ function filterList() {
             <td><span class="chip ${FIELD_CHIPS[d.field]||'chip-gray'}">${d.field}</span></td>
             <td>${d.ministry}</td>
             <td style="color:var(--text3);font-size:11px">${d.program||'-'}</td>
-            <td class="td-budget">${fmt(d.budget)}</td>
+            <td class="td-budget">${fmtEok(d.budget)}억</td>
         </tr>`;
     });
 }
@@ -665,7 +667,7 @@ function makeChart(id, type, labels, values, opts={}) {
                             const v = ctx.parsed.y ?? ctx.parsed.x ?? ctx.parsed ?? 0;
                             if (isPie) {
                                 const total = ctx.dataset.data.reduce((s,n)=>s+n,0);
-                                return ` ${fmt(Math.round(v))} 백만원 (${(v/total*100).toFixed(1)}%)`;
+                                return ` ${(v/100000).toFixed(1)}억원 (${(v/total*100).toFixed(1)}%)`;
                             }
                             return opts.isCount ? ` ${Math.round(v)}건` : ` ${Number(v).toFixed(1)}억원`;
                         }
