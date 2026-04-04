@@ -220,6 +220,72 @@
     }
 
     // ══════════════════════════════
+    // 중앙 우선 분야 배치
+    // sorted: 빌딩 수 내림차순 정렬된 분야 배열
+    // → 가장 많은 분야를 중앙에, 나머지를 상·하·좌·우 4방향으로 분산
+    // ══════════════════════════════
+    function buildCenterLayout(sorted, GS) {
+        if (!sorted.length) return [];
+        if (sorted.length === 1) {
+            return [{ ...sorted[0], x: -GS/2, y: -GS/2, w: GS, h: GS }];
+        }
+
+        const totalCount = sorted.reduce((s,f) => s + f.count, 0);
+        const cf = sorted[0];
+        const rest = sorted.slice(1);
+        const restCount = rest.reduce((s,f) => s + f.count, 0);
+
+        // 중앙 분야 크기: 개수 비율의 제곱근 × GS
+        const cfRatio = cf.count / totalCount;
+        const cfSize = GS * Math.sqrt(cfRatio);
+        const halfSide = (GS - cfSize) / 2;
+
+        const results = [{ ...cf, x: -cfSize/2, y: -cfSize/2, w: cfSize, h: cfSize }];
+        if (!rest.length) return results;
+
+        // 4방향 띠 정의 (상·하는 전체 폭, 좌·우는 중앙 높이만)
+        //   [  TOP (전체 폭)  ]
+        //   [L][  CENTER  ][R]
+        //   [ BOTTOM (전체 폭)]
+        const strips = [
+            { x: -GS/2,    y: -GS/2,     w: GS,      h: halfSide, items: [] }, // 상
+            { x: -GS/2,    y: cfSize/2,  w: GS,      h: halfSide, items: [] }, // 하
+            { x: -GS/2,    y: -cfSize/2, w: halfSide, h: cfSize,  items: [] }, // 좌
+            { x: cfSize/2, y: -cfSize/2, w: halfSide, h: cfSize,  items: [] }, // 우
+        ].filter(s => s.w > 1 && s.h > 1);
+
+        // 각 띠의 목표 수용 개수 (면적 비례)
+        const totalStripArea = strips.reduce((s,st) => s + st.w * st.h, 0);
+        strips.forEach(st => {
+            st.targetCount = (st.w * st.h / totalStripArea) * restCount;
+            st.usedCount = 0;
+        });
+
+        // 그리디 배분: 잔여 용량이 가장 큰 띠에 순서대로 배정
+        rest.forEach(f => {
+            let best = 0, bestScore = -Infinity;
+            strips.forEach((st, i) => {
+                const score = st.targetCount - st.usedCount;
+                if (score > bestScore) { bestScore = score; best = i; }
+            });
+            strips[best].items.push(f);
+            strips[best].usedCount += f.count;
+        });
+
+        // 각 띠 안에서 squarify로 배치 (개수 비례 면적)
+        strips.forEach(st => {
+            if (!st.items.length) return;
+            const stTotal = st.items.reduce((s,f) => s + f.count, 0);
+            const sItems = st.items.map(f => ({
+                ...f, area: (f.count / stTotal) * st.w * st.h
+            }));
+            squarify(sItems, st.x, st.y, st.w, st.h).forEach(r => results.push(r));
+        });
+
+        return results;
+    }
+
+    // ══════════════════════════════
     // Three.js 초기화
     // ══════════════════════════════
     function initScene() {
@@ -579,29 +645,33 @@
             item._bs = Math.max(6, Math.min(70, Math.log10(item.budget / 10000 + 1) * 14));
         });
 
-        // 2단계: 분야별 집계 (bs² 합계도 포함)
+        // 2단계: 분야별 집계 (빌딩 개수·bs² 합계 포함)
         const fieldMap = {};
         items.forEach(item => {
             const f = item.field || '기타';
-            if (!fieldMap[f]) fieldMap[f] = { name: f, budget: 0, items: [], bsArea: 0 };
+            if (!fieldMap[f]) fieldMap[f] = { name: f, budget: 0, count: 0, items: [], bsArea: 0 };
             fieldMap[f].budget += item.budget;
+            fieldMap[f].count++;
             fieldMap[f].items.push(item);
             fieldMap[f].bsArea += item._bs * item._bs;
         });
 
         const total = items.reduce((s,d) => s+d.budget, 0);
 
-        // 3단계: 분야별 필요 바닥 면적 = bs²의 합 × 여유 계수 (건물이 촘촘하게 모임)
-        const FLOOR_PADDING = 2.2; // 바닥 여유 (통로 + 여백)
-        const fieldList = Object.values(fieldMap).sort((a,b) => b.budget - a.budget);
+        // 3단계: 도시 전체 크기 결정 (bs² 기반)
+        const FLOOR_PADDING = 2.2; // 바닥 여유
+        // 빌딩 개수 내림차순 정렬 → buildCenterLayout 에서 첫 번째가 중앙에 배치됨
+        const fieldList = Object.values(fieldMap).sort((a,b) => b.count - a.count);
         const totalBsArea = fieldList.reduce((s,f) => s + f.bsArea, 0);
-        const GS = Math.round(Math.sqrt(totalBsArea * FLOOR_PADDING) * 1.05); // 동적 도시 크기
-        GROUND_SIZE = GS; // 전역 업데이트 (카메라/fog에 반영)
-        spherical.radius = GS * 1.5; // 초기 카메라 거리도 맞게 조정
+        const GS = Math.round(Math.sqrt(totalBsArea * FLOOR_PADDING) * 1.05);
+        GROUND_SIZE = GS;
+        spherical.radius = GS * 1.5;
 
-        // 4단계: 분야 squarify - 예산 비율 대신 실제 필요 면적 기반
-        const fieldItems = fieldList.map(f => ({ ...f, area: f.bsArea * FLOOR_PADDING }));
-        const fieldRects = squarify(fieldItems, -GS/2, -GS/2, GS, GS);
+        // 4단계: 중앙 우선 분야 배치
+        //   - 바닥 면적 ∝ 빌딩 개수
+        //   - 가장 많은 분야 → 중앙 정사각형
+        //   - 나머지 → 상·하·좌·우 4방향 띠
+        const fieldRects = buildCenterLayout(fieldList, GS);
 
         // fieldLayouts 생성 (rx0/rz0/rx1/rz1 형식)
         fieldLayouts = fieldRects.map(fr => ({
