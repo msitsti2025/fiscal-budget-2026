@@ -105,6 +105,38 @@
         .detail-row.open{display:table-row;}
         .detail-row td{padding:0;}
         .detail-inner{padding:0 14px 10px 50px;border-top:1px dashed #e2e8f0;}
+        /* 계층형 트리 */
+        .tree-row{display:flex;align-items:center;padding:9px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;user-select:none;gap:10px;}
+        .tree-row:last-child{border-bottom:none;}
+        .tree-row:hover{background:var(--accent-light);}
+        .tree-row.open{background:#f0f7ff;}
+        .tree-toggle{width:18px;height:18px;border-radius:4px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;color:var(--text3);transition:transform .15s,background .15s;}
+        .tree-row.open > .tree-toggle{transform:rotate(90deg);background:var(--accent2);color:#fff;}
+        .tree-icon{font-size:15px;flex-shrink:0;}
+        .tree-label{flex:1;font-size:13px;font-weight:600;color:var(--text);min-width:0;}
+        .tree-sub{font-size:11px;color:var(--text3);margin-top:1px;font-weight:400;}
+        .tree-badge{font-size:11px;color:var(--text3);white-space:nowrap;}
+        .tree-budget{font-size:12px;font-weight:700;color:var(--accent2);white-space:nowrap;min-width:80px;text-align:right;}
+        .tree-children{display:none;border-top:1px dashed var(--border);}
+        .tree-children.open{display:block;}
+        /* 들여쓰기 레벨별 */
+        .tree-lv0{background:var(--surface2);}
+        .tree-lv0 .tree-label{font-size:14px;}
+        .tree-lv1{padding-left:32px;background:#fff;}
+        .tree-lv2{padding-left:52px;background:var(--surface2);}
+        .tree-lv3{padding-left:72px;background:#fff;}
+        .tree-lv4{padding-left:92px;background:#fafbff;cursor:default;}
+        .tree-lv4:hover{background:#fafbff;}
+        .tree-lv4 .tree-label{font-size:12px;font-weight:500;color:var(--text2);}
+        .tree-bar-wrap{width:80px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;flex-shrink:0;}
+        .tree-bar{height:100%;border-radius:2px;background:var(--accent2);}
+        .tree-lv0 .tree-bar{background:var(--accent2);}
+        .tree-lv1 .tree-bar{background:#059669;}
+        .tree-lv2 .tree-bar{background:#d97706;}
+        .tree-lv3 .tree-bar{background:#7c3aed;}
+        .tree-breadcrumb-item{padding:3px 8px;background:var(--accent-light);border:1px solid #bfdbfe;border-radius:5px;color:var(--accent2);cursor:pointer;font-weight:600;}
+        .tree-breadcrumb-item:hover{background:var(--accent2);color:#fff;}
+        .tree-breadcrumb-sep{color:var(--text4);}
         .detail-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:11px;}
         .detail-table th{background:#eef2ff;color:#4338ca;font-weight:600;padding:6px 10px;text-align:left;border-bottom:1px solid #c7d2fe;cursor:default;}
         .detail-table th:hover{color:#4338ca;background:#eef2ff;}
@@ -130,8 +162,13 @@
         @keyframes spin{to{transform:rotate(360deg);}}
         .loading-text{color:var(--text3);font-size:14px;}
         .treemap-container{width:100%;height:420px;position:relative;border-radius:10px;overflow:hidden;background:var(--surface2);}
-        .treemap-cell{position:absolute;display:flex;flex-direction:column;justify-content:flex-end;padding:10px 12px;cursor:default;transition:filter .15s;overflow:hidden;border:2px solid #fff;border-radius:6px;box-sizing:border-box;}
-        .treemap-cell:hover{filter:brightness(.93);z-index:10;}
+        .treemap-cell{position:absolute;display:flex;flex-direction:column;justify-content:flex-end;padding:10px 12px;cursor:default;transition:filter .15s,box-shadow .15s;overflow:hidden;border:2px solid #fff;border-radius:6px;box-sizing:border-box;}
+        .treemap-cell:hover{filter:brightness(.93);z-index:10;box-shadow:0 0 0 3px rgba(255,255,255,.7),0 8px 24px rgba(0,0,0,.25);}
+        #treemap-tooltip{position:fixed;z-index:99999;pointer-events:none;opacity:0;transition:opacity .12s;background:rgba(15,23,42,.93);color:#fff;padding:9px 14px;border-radius:9px;font-size:13px;font-family:var(--font);box-shadow:0 4px 20px rgba(0,0,0,.35);white-space:nowrap;max-width:320px;white-space:normal;}
+        #treemap-tooltip.show{opacity:1;}
+        #treemap-tooltip .tt-name{font-weight:700;font-size:14px;margin-bottom:4px;}
+        #treemap-tooltip .tt-val{color:#93c5fd;font-weight:600;}
+        #treemap-tooltip .tt-pct{color:#86efac;font-size:12px;margin-top:2px;}
         .treemap-cell-name{font-size:13px;font-weight:700;color:#fff;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,.3);}
         .treemap-cell-val{font-size:12px;font-weight:600;color:rgba(255,255,255,.9);margin-top:4px;text-shadow:0 1px 2px rgba(0,0,0,.3);}
         .treemap-cell-pct{font-size:11px;color:rgba(255,255,255,.75);margin-top:1px;}
@@ -165,6 +202,11 @@
     <div id="loading" style="display:flex">
         <div class="spinner"></div>
         <div class="loading-text">데이터 로딩 중...</div>
+    </div>
+    <div id="treemap-tooltip">
+        <div class="tt-name"></div>
+        <div class="tt-val"></div>
+        <div class="tt-pct"></div>
     </div>
 
     <header>
@@ -451,26 +493,12 @@
                     </div>
                 </div>
                 <div class="table-card">
-                    <div class="table-header">
-                        <div class="table-title">단위사업 목록</div>
+                    <div class="table-header" style="flex-wrap:wrap;gap:8px;">
+                        <div class="table-title">계층별 사업 목록</div>
+                        <div id="tree-breadcrumb" style="display:flex;align-items:center;gap:4px;font-size:12px;flex-wrap:wrap;"></div>
                         <div class="table-meta"><span class="badge badge-blue" id="list-table-count"></span></div>
                     </div>
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="width:30px" class="nosort"></th>
-                                    <th onclick="listSortBy('name')" id="lt-name">단위사업명</th>
-                                    <th style="width:90px" onclick="listSortBy('ministry')" id="lt-ministry">부처</th>
-                                    <th style="width:110px" onclick="listSortBy('field')" id="lt-field">분야</th>
-                                    <th style="width:130px" onclick="listSortBy('subfield')" id="lt-subfield">부문</th>
-                                    <th style="text-align:right;width:120px" onclick="listSortBy('budget')" id="lt-budget">예산(백만원) ▼</th>
-                                </tr>
-                            </thead>
-                            <tbody id="list-table-body"></tbody>
-                        </table>
-                    </div>
-                    <div class="pagination" id="list-pagination"></div>
+                    <div id="tree-container" style="padding:6px 0;"></div>
                 </div>
             </div>
         </div>
@@ -639,6 +667,25 @@
     // ══════════════════════════════
     // 트리맵
     // ══════════════════════════════
+    const _tip = () => document.getElementById('treemap-tooltip');
+    function _showTip(e, label, budget, totalBud) {
+        const t = _tip();
+        t.querySelector('.tt-name').textContent = label;
+        t.querySelector('.tt-val').textContent = fmtBudget(budget);
+        t.querySelector('.tt-pct').textContent = pct(budget, totalBud);
+        _moveTip(e);
+        t.classList.add('show');
+    }
+    function _moveTip(e) {
+        const t = _tip();
+        const x = e.clientX + 16, y = e.clientY - 10;
+        const maxX = window.innerWidth - t.offsetWidth - 10;
+        const maxY = window.innerHeight - t.offsetHeight - 10;
+        t.style.left = Math.min(x, maxX) + 'px';
+        t.style.top  = Math.min(y, maxY) + 'px';
+    }
+    function _hideTip() { _tip().classList.remove('show'); }
+
     function renderTreemap(containerId, items, total) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -648,18 +695,20 @@
         const sorted = [...items].sort((a,b) => b.budget - a.budget);
         const totalBud = sorted.reduce((s,r) => s + r.budget, 0);
         const rects = squarify(sorted.map(d => ({...d, area:(d.budget/totalBud)*W*H})), 0, 0, W, H);
-        rects.forEach((r,i) => {
+        rects.forEach((r) => {
             const cell = document.createElement('div');
             cell.className = 'treemap-cell';
             const w=r.w, h=r.h;
             const sizeClass = w<120||h<80 ? 'tiny' : w<180||h<100 ? 'small' : '';
             if (sizeClass) cell.classList.add(sizeClass);
             cell.style.cssText = `left:${r.x}px;top:${r.y}px;width:${w}px;height:${h}px;background:linear-gradient(135deg,${r.color}dd,${r.color}99)`;
-            cell.title = `${r.label}: ${fmtM(r.budget)} 백만원 (${pct(r.budget,total)})`;
             cell.innerHTML = `
                 <div class="treemap-cell-name">${r.label}</div>
                 <div class="treemap-cell-val">${fmtBudget(r.budget)}</div>
                 <div class="treemap-cell-pct">${pct(r.budget,total)}</div>`;
+            cell.addEventListener('mouseenter', e => _showTip(e, r.label, r.budget, total));
+            cell.addEventListener('mousemove',  e => _moveTip(e));
+            cell.addEventListener('mouseleave', () => _hideTip());
             container.appendChild(cell);
         });
     }
@@ -857,25 +906,13 @@
     // ══════════════════════════════
     // ③ 세부사업 목록
     // ══════════════════════════════
-    function listSortBy(key) {
-        if (listSortKey === key) { listSortDir *= -1; }
-        else { listSortKey = key; listSortDir = key==='budget' ? -1 : 1; }
-        ['name','ministry','field','subfield','budget'].forEach(k => {
-            const el = document.getElementById('lt-'+k);
-            if (el) el.textContent = el.textContent.replace(/[▲▼]/g,'').trim() + (k===key?(listSortDir>0?' ▲':' ▼'):'');
-        });
-        listPage = 1;
-        renderList();
-    }
-
+    // ══════════════════════════════════════════
+    // 계층형 세부사업 목록 (분야→부문→프로그램→단위사업→세부사업)
+    // ══════════════════════════════════════════
     function renderList() {
         const total = allData.reduce((s,r) => s+r.budget, 0);
-        const tb = filtered.reduce((s,r) => s+r.budget, 0);
-        const sorted = [...filtered].sort((a,b) => {
-            const av = a[listSortKey]||0, bv = b[listSortKey]||0;
-            if (typeof av === 'string') return listSortDir * av.localeCompare(bv);
-            return listSortDir * (bv - av);
-        });
+        const tb    = filtered.reduce((s,r) => s+r.budget, 0);
+        const sorted = [...filtered].sort((a,b) => b.budget - a.budget);
 
         document.getElementById('list-k-sub').textContent = filtered.length.toLocaleString();
         document.getElementById('list-k-sub-pct').textContent = `전체의 ${pct(filtered.length,allData.length)}`;
@@ -884,69 +921,132 @@
         document.getElementById('list-k-avg').textContent = filtered.length ? fmtBudget(tb/filtered.length) : '-';
         const maxItem = sorted[0];
         document.getElementById('list-k-max').textContent = maxItem ? fmtBudget(maxItem.budget) : '-';
-        document.getElementById('list-k-max-name').textContent = maxItem ? maxItem.name.slice(0,15)+'...' : '-';
+        document.getElementById('list-k-max-name').textContent = maxItem ? maxItem.name.slice(0,15)+'…' : '-';
+        document.getElementById('list-table-count').textContent = `${filtered.length.toLocaleString()}개 단위사업`;
 
-        const pages = Math.ceil(sorted.length / LIST_PAGE);
-        if (listPage > pages) listPage = Math.max(1, pages);
-        const pageItems = sorted.slice((listPage-1)*LIST_PAGE, listPage*LIST_PAGE);
-
-        document.getElementById('list-table-count').textContent = `${filtered.length.toLocaleString()}개 사업`;
-
-        document.getElementById('list-table-body').innerHTML = pageItems.map(r => {
-            const fc = FIELD_COLORS[r.field] || '#6b7280';
-            const rowId = 'row-' + r.id;
-            const detHtml = r.details.length ? r.details.map(d =>
-                `<tr><td class="td-name" style="max-width:300px;padding-left:8px">${d.name}</td><td style="text-align:right;font-weight:600;color:var(--accent)">${fmtM(d.budget)}</td><td style="color:var(--text3);font-size:10px">${d.account||''}</td></tr>`
-            ).join('') : '';
-            return `
-            <tr>
-                <td style="text-align:center">${r.details.length > 1 ? `<button class="expand-btn" id="ebtn-${r.id}" onclick="toggleRow(${r.id})">▶</button>` : ''}</td>
-                <td class="td-name">${r.name}</td>
-                <td style="font-size:11px;color:var(--text3);white-space:nowrap">${r.ministry}</td>
-                <td><span class="chip" style="background:${fc}18;color:${fc};border-color:${fc}44;font-size:10px">${r.field}</span></td>
-                <td style="font-size:11px;color:var(--text3)">${r.subfield}</td>
-                <td class="td-budget">${fmtM(r.budget)}</td>
-            </tr>
-            ${r.details.length > 1 ? `<tr class="detail-row ${expandedRows.has(r.id)?'open':''}" id="${rowId}">
-                <td colspan="6">
-                    <div class="detail-inner">
-                        <table class="detail-table">
-                            <thead><tr><th>세부사업명</th><th style="text-align:right">예산(백만원)</th><th>회계</th></tr></thead>
-                            <tbody>${detHtml}</tbody>
-                        </table>
-                    </div>
-                </td>
-            </tr>` : ''}`;
-        }).join('');
-
-        // Pagination
-        const pg = document.getElementById('list-pagination');
-        pg.innerHTML = '';
-        if (pages <= 1) return;
-        const addBtn = (lbl, page, disabled=false, active=false) => {
-            const b = document.createElement('button');
-            b.className = 'page-btn' + (active?' active':'');
-            b.textContent = lbl;
-            b.disabled = disabled;
-            b.onclick = () => { listPage=page; renderList(); };
-            pg.appendChild(b);
-        };
-        addBtn('«', 1, listPage===1);
-        addBtn('‹', listPage-1, listPage===1);
-        const start = Math.max(1, listPage-2);
-        const end = Math.min(pages, start+4);
-        for (let i=start; i<=end; i++) addBtn(i, i, false, i===listPage);
-        addBtn('›', listPage+1, listPage===pages);
-        addBtn('»', pages, listPage===pages);
+        buildTree(sorted, tb);
     }
 
-    function toggleRow(id) {
-        if (expandedRows.has(id)) expandedRows.delete(id);
-        else expandedRows.add(id);
-        const row = document.getElementById('row-'+id);
-        const btn = document.getElementById('ebtn-'+id);
-        if (row) row.classList.toggle('open', expandedRows.has(id));
-        if (btn) btn.classList.toggle('open', expandedRows.has(id));
+    function buildTree(items, totalBudget) {
+        const container = document.getElementById('tree-container');
+        container.innerHTML = '';
+        document.getElementById('tree-breadcrumb').innerHTML = '';
+
+        // 분야 → 부문 → 프로그램 → 단위사업 → 세부사업 집계
+        const fieldMap = {};
+        items.forEach(r => {
+            const f  = r.field    || '(미분류)';
+            const sf = r.subfield || '(미분류)';
+            const pg = r.program  || '(미분류)';
+            if (!fieldMap[f]) fieldMap[f] = { budget:0, subs:{} };
+            fieldMap[f].budget += r.budget;
+            if (!fieldMap[f].subs[sf]) fieldMap[f].subs[sf] = { budget:0, progs:{} };
+            fieldMap[f].subs[sf].budget += r.budget;
+            if (!fieldMap[f].subs[sf].progs[pg]) fieldMap[f].subs[sf].progs[pg] = { budget:0, items:[] };
+            fieldMap[f].subs[sf].progs[pg].budget += r.budget;
+            fieldMap[f].subs[sf].progs[pg].items.push(r);
+        });
+
+        const fields = Object.entries(fieldMap).sort((a,b) => b[1].budget - a[1].budget);
+        const ICONS = { field:'🗂', subfield:'📂', program:'📋', unit:'📄', detail:'📌' };
+
+        fields.forEach(([fieldName, fd]) => {
+            const fc = FIELD_COLORS[fieldName] || '#6b7280';
+            const fieldEl = makeTreeNode({
+                level:0, icon: ICONS.field, label: fieldName,
+                sub: `${Object.keys(fd.subs).length}개 부문`,
+                budget: fd.budget, totalBudget,
+                color: fc, hasChildren: true
+            });
+            container.appendChild(fieldEl.row);
+
+            const sfContainer = document.createElement('div');
+            sfContainer.className = 'tree-children';
+            container.appendChild(sfContainer);
+            fieldEl.row.addEventListener('click', () => toggleTreeRow(fieldEl.row, sfContainer));
+
+            const subfields = Object.entries(fd.subs).sort((a,b) => b[1].budget - a[1].budget);
+            subfields.forEach(([sfName, sfd]) => {
+                const sfEl = makeTreeNode({
+                    level:1, icon: ICONS.subfield, label: sfName,
+                    sub: `${Object.keys(sfd.progs).length}개 프로그램`,
+                    budget: sfd.budget, totalBudget,
+                    color: '#059669', hasChildren: true
+                });
+                sfContainer.appendChild(sfEl.row);
+
+                const pgContainer = document.createElement('div');
+                pgContainer.className = 'tree-children';
+                sfContainer.appendChild(pgContainer);
+                sfEl.row.addEventListener('click', () => toggleTreeRow(sfEl.row, pgContainer));
+
+                const progs = Object.entries(sfd.progs).sort((a,b) => b[1].budget - a[1].budget);
+                progs.forEach(([pgName, pgd]) => {
+                    const pgEl = makeTreeNode({
+                        level:2, icon: ICONS.program, label: pgName,
+                        sub: `${pgd.items.length}개 단위사업`,
+                        budget: pgd.budget, totalBudget,
+                        color: '#d97706', hasChildren: true
+                    });
+                    pgContainer.appendChild(pgEl.row);
+
+                    const unitContainer = document.createElement('div');
+                    unitContainer.className = 'tree-children';
+                    pgContainer.appendChild(unitContainer);
+                    pgEl.row.addEventListener('click', () => toggleTreeRow(pgEl.row, unitContainer));
+
+                    const unitItems = [...pgd.items].sort((a,b) => b.budget - a.budget);
+                    unitItems.forEach(r => {
+                        const hasDetails = r.details && r.details.length > 0;
+                        const unitEl = makeTreeNode({
+                            level:3, icon: ICONS.unit, label: r.name,
+                            sub: r.ministry,
+                            budget: r.budget, totalBudget,
+                            color: '#7c3aed', hasChildren: hasDetails
+                        });
+                        unitContainer.appendChild(unitEl.row);
+
+                        if (hasDetails) {
+                            const detContainer = document.createElement('div');
+                            detContainer.className = 'tree-children';
+                            unitContainer.appendChild(detContainer);
+                            unitEl.row.addEventListener('click', () => toggleTreeRow(unitEl.row, detContainer));
+
+                            r.details.forEach(d => {
+                                const detEl = makeTreeNode({
+                                    level:4, icon: ICONS.detail, label: d.name,
+                                    sub: d.account || '',
+                                    budget: d.budget, totalBudget,
+                                    color: '#6b7280', hasChildren: false
+                                });
+                                detContainer.appendChild(detEl.row);
+                            });
+                        }
+                    });
+                });
+            });
+        });
+    }
+
+    function makeTreeNode({ level, icon, label, sub, budget, totalBudget, color, hasChildren }) {
+        const row = document.createElement('div');
+        row.className = `tree-row tree-lv${level}`;
+        const barW = totalBudget > 0 ? Math.round(budget / totalBudget * 100) : 0;
+        row.innerHTML = `
+            ${hasChildren ? `<span class="tree-toggle">▶</span>` : `<span style="width:18px;flex-shrink:0"></span>`}
+            <span class="tree-icon">${icon}</span>
+            <span style="flex:1;min-width:0;">
+                <div class="tree-label">${label}</div>
+                ${sub ? `<div class="tree-sub">${sub}</div>` : ''}
+            </span>
+            <span class="tree-bar-wrap"><span class="tree-bar" style="width:${barW}%;background:${color}"></span></span>
+            <span class="tree-budget">${fmtM(budget)}</span>`;
+        return { row };
+    }
+
+    function toggleTreeRow(row, children) {
+        const isOpen = children.classList.toggle('open');
+        row.classList.toggle('open', isOpen);
     }
 
     // ══════════════════════════════
