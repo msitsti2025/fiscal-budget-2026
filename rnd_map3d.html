@@ -78,7 +78,7 @@
             <div class="logo-icon">🔬</div>
             <div>
                 <div class="logo-text">2026년 R&D 예산 3D 도시</div>
-                <div class="logo-sub">바닥 = 분야별 트리맵 · 건물 = R&D 사업 · 높이 = log(예산)</div>
+                <div class="logo-sub">바닥 = 분야별 구역 · 건물 = R&D 사업 · 높이·크기 = log(예산)</div>
             </div>
         </div>
         <div class="hstats">
@@ -86,7 +86,6 @@
             <div class="hstat"><div class="hstat-val" id="h-field">-</div><div class="hstat-label">분야</div></div>
             <div class="hstat"><div class="hstat-val" id="h-bldg">-</div><div class="hstat-label">R&D 사업</div></div>
             <div class="hstat"><div class="hstat-val" id="h-sub">-</div><div class="hstat-label">참여 부처</div></div>
-            <a href="rnd_budget.html" class="back-btn">← 뒤로가기</a>
         </div>
     </div>
 
@@ -128,8 +127,7 @@
     // ══════════════════════════════
     // 상수
     // ══════════════════════════════
-    const GROUND_SIZE = 2800;
-    const GROUND_HALF = GROUND_SIZE / 2;
+    let GROUND_SIZE = 1400; // loadData() 후 동적으로 갱신됨
 
     const FIELD_COLORS_INT = {
         '과학기술':0x7c3aed,'산업·중소기업및에너지':0xd97706,
@@ -155,7 +153,7 @@
     let hiddenFields = new Set();
     let isDragging = false, isRightDragging = false;
     let lastMouse = {x:0, y:0};
-    let spherical = {theta: Math.PI/5, phi: Math.PI/3.2, radius: 4200};
+    let spherical = {theta: Math.PI/5, phi: Math.PI/3.2, radius: 2100};
     let target = {x:0, y:0, z:0};
 
     // ══════════════════════════════
@@ -227,10 +225,10 @@
     function initScene() {
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0d1117);
-        scene.fog = new THREE.Fog(0x0d1117, 3000, 7000);
+        scene.fog = new THREE.Fog(0x0d1117, GROUND_SIZE * 1.4, GROUND_SIZE * 3.2);
 
         const w = window.innerWidth, h = window.innerHeight;
-        camera = new THREE.PerspectiveCamera(50, w / h, 1, 9000);
+        camera = new THREE.PerspectiveCamera(50, w / h, 1, GROUND_SIZE * 5);
         updateCamera();
 
         renderer = new THREE.WebGLRenderer({antialias: true});
@@ -246,10 +244,10 @@
         sun.position.set(1000, 2000, 800);
         sun.castShadow = true;
         sun.shadow.mapSize.set(2048, 2048);
-        sun.shadow.camera.left = sun.shadow.camera.bottom = -3000;
-        sun.shadow.camera.right = sun.shadow.camera.top = 3000;
+        sun.shadow.camera.left = sun.shadow.camera.bottom = -GROUND_SIZE * 1.2;
+        sun.shadow.camera.right = sun.shadow.camera.top = GROUND_SIZE * 1.2;
         sun.shadow.camera.near = 1;
-        sun.shadow.camera.far = 8000;
+        sun.shadow.camera.far = GROUND_SIZE * 4;
         scene.add(sun);
         const fill = new THREE.DirectionalLight(0x4080ff, 1.0);
         fill.position.set(-600, 600, -600);
@@ -452,7 +450,7 @@
         fieldFloorMeshes.forEach(m => m.visible = showFloors);
     }
     function resetCamera() {
-        spherical = {theta: Math.PI / 5, phi: Math.PI / 3.2, radius: 4200};
+        spherical = {theta: Math.PI / 5, phi: Math.PI / 3.2, radius: GROUND_SIZE * 1.5};
         target = {x: 0, y: 0, z: 0};
         updateCamera();
     }
@@ -576,21 +574,33 @@
         const res = await fetch('rnd_budget.json?v=' + Date.now());
         const items = await res.json();
 
-        // 분야별 집계
+        // 1단계: 각 항목의 bs(건물 발판 크기) 먼저 계산
+        items.forEach(item => {
+            item._bs = Math.max(6, Math.min(70, Math.log10(item.budget / 10000 + 1) * 14));
+        });
+
+        // 2단계: 분야별 집계 (bs² 합계도 포함)
         const fieldMap = {};
         items.forEach(item => {
             const f = item.field || '기타';
-            if (!fieldMap[f]) fieldMap[f] = { name: f, budget: 0, items: [] };
+            if (!fieldMap[f]) fieldMap[f] = { name: f, budget: 0, items: [], bsArea: 0 };
             fieldMap[f].budget += item.budget;
             fieldMap[f].items.push(item);
+            fieldMap[f].bsArea += item._bs * item._bs;
         });
 
         const total = items.reduce((s,d) => s+d.budget, 0);
-        const GS = GROUND_SIZE;
 
-        // 분야 treemap 레이아웃
+        // 3단계: 분야별 필요 바닥 면적 = bs²의 합 × 여유 계수 (건물이 촘촘하게 모임)
+        const FLOOR_PADDING = 2.2; // 바닥 여유 (통로 + 여백)
         const fieldList = Object.values(fieldMap).sort((a,b) => b.budget - a.budget);
-        const fieldItems = fieldList.map(f => ({ ...f, area: (f.budget/total)*GS*GS }));
+        const totalBsArea = fieldList.reduce((s,f) => s + f.bsArea, 0);
+        const GS = Math.round(Math.sqrt(totalBsArea * FLOOR_PADDING) * 1.05); // 동적 도시 크기
+        GROUND_SIZE = GS; // 전역 업데이트 (카메라/fog에 반영)
+        spherical.radius = GS * 1.5; // 초기 카메라 거리도 맞게 조정
+
+        // 4단계: 분야 squarify - 예산 비율 대신 실제 필요 면적 기반
+        const fieldItems = fieldList.map(f => ({ ...f, area: f.bsArea * FLOOR_PADDING }));
         const fieldRects = squarify(fieldItems, -GS/2, -GS/2, GS, GS);
 
         // fieldLayouts 생성 (rx0/rz0/rx1/rz1 형식)
@@ -600,16 +610,16 @@
             rx0: fr.x, rz0: fr.y, rx1: fr.x+fr.w, rz1: fr.y+fr.h
         }));
 
-        // 건물 배치: 각 분야 안에서 items를 squarify
+        // 5단계: 건물 배치 - bs² 비율로 squarify → 빈 공간 최소화
         const buildings = [];
         fieldRects.forEach(fr => {
-            const fitems = fr.items.sort((a,b) => b.budget - a.budget);
-            const ftotal = fitems.reduce((s,d) => s+d.budget, 0);
-            if (!ftotal) return;
-            const bItems = fitems.map(d => ({ ...d, area: (d.budget/ftotal)*fr.w*fr.h }));
+            const fitems = fr.items.sort((a,b) => b._bs - a._bs);
+            const ftotalBs = fitems.reduce((s,d) => s + d._bs * d._bs, 0);
+            if (!ftotalBs) return;
+            const bItems = fitems.map(d => ({ ...d, area: (d._bs * d._bs / ftotalBs) * fr.w * fr.h }));
             const bRects = squarify(bItems, fr.x, fr.y, fr.w, fr.h);
             bRects.forEach(br => {
-                const bs = Math.max(6, Math.min(70, Math.log10(br.budget / 10000 + 1) * 14));
+                const bs = br._bs;
                 buildings.push({
                     id: br.id,
                     name: br.name,
