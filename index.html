@@ -398,11 +398,9 @@
                 <div class="chart-card wide">
                     <div class="chart-title">
                         <span class="chart-title-dot" style="background:#2563eb"></span>
-                        부처별 예산 규모 (상위 30개)
+                        부처별 예산 규모 (트리맵)
                     </div>
-                    <div class="chart-wrap h400">
-                        <canvas id="min-full-chart"></canvas>
-                    </div>
+                    <div id="min-full-chart" class="treemap-container" style="height:440px;"></div>
                 </div>
                 <div class="table-card">
                     <div class="table-header">
@@ -819,31 +817,21 @@
         document.getElementById('min-k-avg').textContent = mc ? fmtBudget(total/mc) : '-';
         document.getElementById('min-table-count').textContent = `${mc}개 부처`;
 
-        const top30 = minList.slice(0,30);
-        const colors = top30.map((_,i) => {
-            const h = (i*360/30)|0;
-            return `hsl(${h},60%,50%)`;
-        });
-        mkChart('min-full-chart', {
-            type:'bar',
-            data:{
-                labels:top30.map(m=>m.name),
-                datasets:[{
-                    data:top30.map(m=>m.budget),
-                    backgroundColor:colors.map(c=>c.replace('50%','50%').replace('hsl','hsla').replace(')',',0.4)')),
-                    borderColor:colors,
-                    borderWidth:1.5, borderRadius:4
-                }]
-            },
-            options:{
-                indexAxis:'y', responsive:true, maintainAspectRatio:false,
-                plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>fmtBudget(c.raw)}} },
-                scales:{
-                    x:{ticks:{color:TC,font:{size:10},callback:barY},grid:GRID},
-                    y:{ticks:{color:'#334155',font:{size:10}},grid:GRID}
-                }
-            }
-        });
+        const MINISTRY_COLORS = [
+            '#1d4ed8','#059669','#d97706','#dc2626','#7c3aed',
+            '#0d9488','#db2777','#ea580c','#0891b2','#65a30d',
+            '#9333ea','#b45309','#0369a1','#15803d','#c2410c',
+            '#7e22ce','#0f766e','#be123c','#1e40af','#166534',
+            '#92400e','#6b21a8','#134e4a','#9f1239','#1e3a8a',
+            '#14532d','#78350f','#4c1d95','#042f2e','#881337'
+        ];
+        const treemapItems = minList.map((m, i) => ({
+            label: m.name,
+            budget: m.budget,
+            color: MINISTRY_COLORS[i % MINISTRY_COLORS.length],
+            count: m.count
+        }));
+        renderTreemap('min-full-chart', treemapItems, total);
 
         document.getElementById('min-table-body').innerHTML = minList.map((m,i) => {
             const topField = Object.entries(m.fields).sort((a,b)=>b[1]-a[1])[0];

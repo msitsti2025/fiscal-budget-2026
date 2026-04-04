@@ -124,6 +124,13 @@
         .section-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
         .section-title::before{content:'';display:inline-block;width:3px;height:15px;background:var(--rnd-accent);border-radius:2px;}
 
+        /* Pagination */
+        .pagination{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:12px 16px;border-top:1px solid var(--border);background:var(--surface2);}
+        .page-btn{padding:5px 10px;border:1px solid var(--border2);border-radius:6px;background:var(--surface);color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;font-family:var(--font);}
+        .page-btn:hover:not(:disabled){border-color:var(--rnd-accent);color:var(--rnd-accent);background:var(--rnd-light);}
+        .page-btn.active{background:var(--rnd-accent);border-color:var(--rnd-accent);color:#fff;font-weight:700;}
+        .page-btn:disabled{opacity:.3;cursor:not-allowed;}
+
         @media(max-width:900px){
             .kpi-row{grid-template-columns:repeat(2,1fr);}
             .charts-grid{grid-template-columns:1fr;}
@@ -278,6 +285,7 @@
                     <tbody id="field-detail-tbody"></tbody>
                 </table>
             </div>
+            <div id="field-detail-pager" class="pagination"></div>
         </div>
     </div>
 
@@ -327,6 +335,7 @@
                     <tbody id="ministry-detail-tbody"></tbody>
                 </table>
             </div>
+            <div id="ministry-detail-pager" class="pagination"></div>
         </div>
     </div>
 
@@ -359,6 +368,7 @@
                     <tbody id="list-tbody"></tbody>
                 </table>
             </div>
+            <div id="list-pager" class="pagination"></div>
         </div>
     </div>
 </div>
@@ -384,7 +394,7 @@ function fmtEok(n) { return (n / 100000).toFixed(1); }   // 천원 → 억원
 function fmtJo(n)  { return (n / 1000000000).toFixed(2); } // 천원 → 조원
 
 async function init() {
-    const res = await fetch('rnd_budget.json');
+    const res = await fetch('rnd_budget.json?v=' + Date.now());
     allData = await res.json();
     allData.sort((a,b) => b.budget - a.budget);
     document.getElementById('loading').style.display = 'none';
@@ -461,15 +471,12 @@ function buildDashboard() {
     });
 
     // Top 10 table
-    const tbody = document.getElementById('top10-tbody');
-    allData.slice(0, 10).forEach((d, i) => {
-        tbody.innerHTML += `<tr>
-            <td><span style="font-size:11px;font-weight:700;color:${i<3?'#7c3aed':'var(--text4)'}">${i+1}</span></td>
-            <td class="td-name">${d.name}</td>
-            <td><span class="chip ${FIELD_CHIPS[d.ministry]||'chip-gray'}">${d.ministry}</span></td>
-            <td class="td-budget">${fmtEok(d.budget)}억</td>
-        </tr>`;
-    });
+    document.getElementById('top10-tbody').innerHTML = allData.slice(0, 10).map((d, i) => `<tr>
+        <td><span style="font-size:11px;font-weight:700;color:${i<3?'#7c3aed':'var(--text4)'}">${i+1}</span></td>
+        <td class="td-name">${d.name}</td>
+        <td><span class="chip chip-gray">${d.ministry}</span></td>
+        <td class="td-budget">${fmtEok(d.budget)}억</td>
+    </tr>`).join('');
 
     // Field count bar
     const fieldCount = {};
@@ -489,16 +496,12 @@ function buildField() {
     const entries = Object.entries(fieldMap).sort((a,b) => b[1]-a[1]);
 
     // KPI cards per field
-    const kpiRow = document.getElementById('field-kpi-row');
-    entries.forEach((e, i) => {
-        const [field, budget] = e;
-        kpiRow.innerHTML += `
-            <div class="kpi-card ${['purple','blue','green','orange','teal','red','yellow'][i%7]}">
-                <div class="kpi-label">${field}</div>
-                <div class="kpi-value">${fmtEok(budget)}<span class="kpi-unit">억원</span></div>
-                <div class="kpi-sub">${fieldCount[field]}건 · ${(budget/total*100).toFixed(1)}%</div>
-            </div>`;
-    });
+    document.getElementById('field-kpi-row').innerHTML = entries.map(([field, budget], i) => `
+        <div class="kpi-card ${['purple','blue','green','orange','teal','red','yellow'][i%7]}">
+            <div class="kpi-label">${field}</div>
+            <div class="kpi-value">${fmtEok(budget)}<span class="kpi-unit">억원</span></div>
+            <div class="kpi-sub">${fieldCount[field]}건 · ${(budget/total*100).toFixed(1)}%</div>
+        </div>`).join('');
     document.getElementById('field-table-count').textContent = entries.length + '개 분야';
 
     // Bar chart
@@ -509,37 +512,29 @@ function buildField() {
     makeChart('chart-field-donut', 'doughnut', entries.map(e=>e[0]), entries.map(e=>e[1]), {cutout:'55%'});
 
     // Table
-    const tbody = document.getElementById('field-tbody');
-    entries.forEach(([field, budget]) => {
-        const pct = (budget / total * 100).toFixed(1);
+    document.getElementById('field-tbody').innerHTML = entries.map(([field, budget]) => {
+        const p = (budget / total * 100).toFixed(1);
         const barW = Math.round(budget / entries[0][1] * 100);
-        tbody.innerHTML += `<tr>
+        return `<tr>
             <td><span class="chip ${FIELD_CHIPS[field]||'chip-gray'}">${field}</span></td>
             <td class="td-budget">${fmt(budget)}</td>
             <td class="td-budget">${fmtEok(budget)}</td>
-            <td style="text-align:right;font-weight:600;color:var(--rnd-accent)">${pct}%</td>
+            <td style="text-align:right;font-weight:600;color:var(--rnd-accent)">${p}%</td>
             <td>${fieldCount[field]}건</td>
             <td><div class="progress-bar-wrap">
                 <div class="progress-bg"><div class="progress-bar" style="width:${barW}%"></div></div>
             </div></td>
         </tr>`;
-    });
+    }).join('');
 
-    // Detail table
-    const dtbody = document.getElementById('field-detail-tbody');
-    const sorted = [...allData].sort((a,b) => {
-        if (a.field < b.field) return -1;
-        if (a.field > b.field) return 1;
-        return b.budget - a.budget;
-    });
-    sorted.forEach(d => {
-        dtbody.innerHTML += `<tr>
-            <td><span class="chip ${FIELD_CHIPS[d.field]||'chip-gray'}">${d.field}</span></td>
-            <td class="td-name">${d.name}</td>
-            <td>${d.ministry}</td>
-            <td class="td-budget">${fmtEok(d.budget)}억</td>
-        </tr>`;
-    });
+    // Detail table (페이지네이션)
+    const fieldSorted = [...allData].sort((a,b) => a.field < b.field ? -1 : a.field > b.field ? 1 : b.budget - a.budget);
+    registerAndRender('field-detail-tbody', 'field-detail-pager', fieldSorted, d => `<tr>
+        <td><span class="chip ${FIELD_CHIPS[d.field]||'chip-gray'}">${d.field}</span></td>
+        <td class="td-name">${d.name}</td>
+        <td>${d.ministry}</td>
+        <td class="td-budget">${fmtEok(d.budget)}억</td>
+    </tr>`);
 }
 
 // ===== MINISTRY =====
@@ -557,47 +552,41 @@ function buildMinistry() {
     });
     makeChart('chart-ministry-pie', 'doughnut', entries.map(e=>e[0]), entries.map(e=>e[1]), {cutout:'55%'});
 
-    const tbody = document.getElementById('ministry-tbody');
-    entries.forEach(([min, budget], i) => {
-        const pct = (budget / total * 100).toFixed(1);
+    document.getElementById('ministry-tbody').innerHTML = entries.map(([min, budget], i) => {
+        const p = (budget / total * 100).toFixed(1);
         const barW = Math.round(budget / entries[0][1] * 100);
-        tbody.innerHTML += `<tr>
+        return `<tr>
             <td style="font-weight:700;color:${i<3?'#7c3aed':'var(--text4)'}">${i+1}</td>
             <td style="font-weight:600">${min}</td>
             <td class="td-budget">${fmtEok(budget)}억</td>
-            <td style="text-align:right;font-weight:600;color:var(--rnd-accent)">${pct}%</td>
+            <td style="text-align:right;font-weight:600;color:var(--rnd-accent)">${p}%</td>
             <td>${minCount[min]}건</td>
             <td style="min-width:80px"><div class="progress-bar-wrap">
                 <div class="progress-bg"><div class="progress-bar" style="width:${barW}%"></div></div>
             </div></td>
         </tr>`;
-    });
+    }).join('');
 
-    // Detail table
-    const dtbody = document.getElementById('ministry-detail-tbody');
-    const sorted = [...allData].sort((a,b) => {
-        if (a.ministry < b.ministry) return -1;
-        if (a.ministry > b.ministry) return 1;
-        return b.budget - a.budget;
-    });
-    sorted.forEach(d => {
-        dtbody.innerHTML += `<tr>
-            <td style="font-weight:600">${d.ministry}</td>
-            <td class="td-name">${d.name}</td>
-            <td><span class="chip ${FIELD_CHIPS[d.field]||'chip-gray'}">${d.field}</span></td>
-            <td class="td-budget">${fmtEok(d.budget)}억</td>
-        </tr>`;
-    });
+    // Detail table (페이지네이션)
+    const minSorted = [...allData].sort((a,b) => a.ministry < b.ministry ? -1 : a.ministry > b.ministry ? 1 : b.budget - a.budget);
+    registerAndRender('ministry-detail-tbody', 'ministry-detail-pager', minSorted, d => `<tr>
+        <td style="font-weight:600">${d.ministry}</td>
+        <td class="td-name">${d.name}</td>
+        <td><span class="chip ${FIELD_CHIPS[d.field]||'chip-gray'}">${d.field}</span></td>
+        <td class="td-budget">${fmtEok(d.budget)}억</td>
+    </tr>`);
 }
 
 // ===== LIST =====
+let listFiltered = [];
+
 function buildList() {
     const fields = [...new Set(allData.map(d => d.field))].sort();
     const ministries = [...new Set(allData.map(d => d.ministry))].sort();
-    const fSel = document.getElementById('field-filter');
-    const mSel = document.getElementById('ministry-filter');
-    fields.forEach(f => { fSel.innerHTML += `<option value="${f}">${f}</option>`; });
-    ministries.forEach(m => { mSel.innerHTML += `<option value="${m}">${m}</option>`; });
+    document.getElementById('field-filter').innerHTML =
+        '<option value="">전체 분야</option>' + fields.map(f => `<option value="${f}">${f}</option>`).join('');
+    document.getElementById('ministry-filter').innerHTML =
+        '<option value="">전체 부처</option>' + ministries.map(m => `<option value="${m}">${m}</option>`).join('');
     filterList();
 }
 
@@ -605,25 +594,68 @@ function filterList() {
     const query = document.getElementById('search-input').value.toLowerCase();
     const fieldFilter = document.getElementById('field-filter').value;
     const ministryFilter = document.getElementById('ministry-filter').value;
-    const filtered = allData.filter(d => {
+    listFiltered = allData.filter(d => {
         const matchQ = !query || d.name.toLowerCase().includes(query) || d.ministry.toLowerCase().includes(query) || d.field.toLowerCase().includes(query);
         const matchF = !fieldFilter || d.field === fieldFilter;
         const matchM = !ministryFilter || d.ministry === ministryFilter;
         return matchQ && matchF && matchM;
+    }).sort((a,b) => b.budget - a.budget);
+    document.getElementById('list-count').textContent = listFiltered.length + '건';
+    registerAndRender('list-tbody', 'list-pager', listFiltered, (d, i) => `<tr>
+        <td style="color:var(--text4);font-size:11px">${i+1}</td>
+        <td class="td-name">${d.name}</td>
+        <td><span class="chip ${FIELD_CHIPS[d.field]||'chip-gray'}">${d.field}</span></td>
+        <td>${d.ministry}</td>
+        <td style="color:var(--text3);font-size:11px">${d.program||'-'}</td>
+        <td class="td-budget">${fmtEok(d.budget)}억</td>
+    </tr>`);
+}
+
+// ===== PAGED TABLE =====
+const PAGE_SIZE = 50;
+const pagedState = {};
+
+function renderPagedTable(tbodyId, pagerId, data, rowFn, page) {
+    if (page === undefined) page = pagedState[pagerId] || 1;
+    pagedState[pagerId] = page;
+    const total = data.length;
+    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    page = Math.min(page, totalPages);
+    const start = (page - 1) * PAGE_SIZE;
+    const slice = data.slice(start, start + PAGE_SIZE);
+
+    document.getElementById(tbodyId).innerHTML = slice.map((d, i) => rowFn(d, start + i)).join('');
+
+    const pager = document.getElementById(pagerId);
+    if (!pager) return;
+    if (totalPages <= 1) { pager.innerHTML = ''; return; }
+
+    let btns = '';
+    btns += `<button class="page-btn" onclick="goPage('${pagerId}','${tbodyId}',${page-1})" ${page===1?'disabled':''}>‹ 이전</button>`;
+    const range = [];
+    for (let p = 1; p <= totalPages; p++) {
+        if (p===1 || p===totalPages || Math.abs(p-page)<=2) range.push(p);
+        else if (range[range.length-1] !== '…') range.push('…');
+    }
+    range.forEach(p => {
+        if (p === '…') btns += `<span style="padding:5px 4px;color:var(--text4)">…</span>`;
+        else btns += `<button class="page-btn${p===page?' active':''}" onclick="goPage('${pagerId}','${tbodyId}',${p})">${p}</button>`;
     });
-    document.getElementById('list-count').textContent = filtered.length + '건';
-    const tbody = document.getElementById('list-tbody');
-    tbody.innerHTML = '';
-    filtered.sort((a,b) => b.budget - a.budget).forEach((d, i) => {
-        tbody.innerHTML += `<tr>
-            <td style="color:var(--text4);font-size:11px">${i+1}</td>
-            <td class="td-name">${d.name}</td>
-            <td><span class="chip ${FIELD_CHIPS[d.field]||'chip-gray'}">${d.field}</span></td>
-            <td>${d.ministry}</td>
-            <td style="color:var(--text3);font-size:11px">${d.program||'-'}</td>
-            <td class="td-budget">${fmtEok(d.budget)}억</td>
-        </tr>`;
-    });
+    btns += `<button class="page-btn" onclick="goPage('${pagerId}','${tbodyId}',${page+1})" ${page===totalPages?'disabled':''}>다음 ›</button>`;
+    btns += `<span style="font-size:11px;color:var(--text3);margin-left:6px">${total}건 / ${page}/${totalPages}페이지</span>`;
+    pager.innerHTML = btns;
+}
+
+function goPage(pagerId, tbodyId, page) {
+    // 해당 tbody가 어떤 데이터셋과 rowFn을 쓰는지 재조회
+    const state = pagedTableRegistry[tbodyId];
+    if (state) renderPagedTable(tbodyId, pagerId, state.data, state.rowFn, page);
+}
+
+const pagedTableRegistry = {};
+function registerAndRender(tbodyId, pagerId, data, rowFn) {
+    pagedTableRegistry[tbodyId] = { data, rowFn };
+    renderPagedTable(tbodyId, pagerId, data, rowFn);
 }
 
 // ===== HELPERS =====
