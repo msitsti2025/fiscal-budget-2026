@@ -1105,7 +1105,9 @@
             fieldDiv.className = 'nested-treemap-field';
             const color = FIELD_COLORS[fr.label] || '#6b7280';
             fieldDiv.style.cssText = `left:${fr.x}px;top:${fr.y}px;width:${fr.w}px;height:${fr.h}px;background:${color}22;`;
-            fieldDiv.title = `${fr.label}: ${fmtM(fr.budget)} 백만원 (${pct(fr.budget, total)})`;
+            fieldDiv.addEventListener('mouseenter', e => _showTip(e, fr.label, fr.budget, total));
+            fieldDiv.addEventListener('mousemove',  e => _moveTip(e));
+            fieldDiv.addEventListener('mouseleave', () => _hideTip());
 
             // 분야 라벨
             const label = document.createElement('div');
@@ -1130,8 +1132,10 @@
                     if (sw < 50 || sh < 35) cell.classList.add('nst');
                     else if (sw < 90 || sh < 55) cell.classList.add('nsm');
                     cell.style.cssText = `left:${sr.x + 2}px;top:${sr.y + LABEL_H + 2}px;width:${sw}px;height:${sh}px;background:linear-gradient(135deg,${color}bb,${color}88);`;
-                    cell.title = `${sr.label}: ${fmtM(sr.budget)} 백만원 (${pct(sr.budget, total)})`;
                     cell.innerHTML = `<div class="sub-name">${sr.label}</div><div class="sub-val">${fmtBudget(sr.budget)}</div><div class="sub-pct">${pct(sr.budget, fr.budget)}</div>`;
+                    cell.addEventListener('mouseenter', e => _showTip(e, sr.label, sr.budget, total));
+                    cell.addEventListener('mousemove',  e => _moveTip(e));
+                    cell.addEventListener('mouseleave', () => _hideTip());
                     fieldDiv.appendChild(cell);
                 });
             }
@@ -1293,7 +1297,9 @@
                     const subDiv = document.createElement('div');
                     subDiv.className = 'nested-treemap-field';
                     subDiv.style.cssText = `left:${sr.x}px;top:${sr.y}px;width:${sr.w}px;height:${sr.h}px;background:${color}15;`;
-                    subDiv.title = `${sr.label}: ${fmtM(sr.budget)} 백만원 (${pct(sr.budget, fieldTotal)})`;
+                    subDiv.addEventListener('mouseenter', e => _showTip(e, sr.label, sr.budget, fieldTotal));
+                    subDiv.addEventListener('mousemove',  e => _moveTip(e));
+                    subDiv.addEventListener('mouseleave', () => _hideTip());
 
                     // 부문 라벨
                     const lbl = document.createElement('div');
@@ -1319,8 +1325,10 @@
                                 if (cw < 45 || ch < 30) cell.classList.add('nst');
                                 else if (cw < 80 || ch < 50) cell.classList.add('nsm');
                                 cell.style.cssText = `left:${pr.x + 2}px;top:${pr.y + LABEL_H + 2}px;width:${cw}px;height:${ch}px;background:linear-gradient(135deg,${color}aa,${color}77);`;
-                                cell.title = `${pr.label}: ${fmtM(pr.budget)} 백만원 (${pct(pr.budget, fieldTotal)})`;
                                 cell.innerHTML = `<div class="sub-name">${pr.label}</div><div class="sub-val">${fmtBudget(pr.budget)}</div><div class="sub-pct">${pct(pr.budget, sr.budget)}</div>`;
+                                cell.addEventListener('mouseenter', e => _showTip(e, pr.label, pr.budget, fieldTotal));
+                                cell.addEventListener('mousemove',  e => _moveTip(e));
+                                cell.addEventListener('mouseleave', () => _hideTip());
                                 subDiv.appendChild(cell);
                             });
                         }

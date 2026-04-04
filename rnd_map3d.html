@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 정부 예산 3D 예산도시</title>
+    <title>2026년 R&D 예산 3D 도시</title>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
@@ -14,7 +14,7 @@
 
         #header{position:fixed;top:0;left:0;right:0;height:54px;background:rgba(13,17,23,.94);border-bottom:1px solid #30363d;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:100;backdrop-filter:blur(8px);}
         .logo{display:flex;align-items:center;gap:10px;}
-        .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#1d4ed8,#059669);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+        .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#7c3aed,#0891b2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
         .logo-text{font-size:14px;font-weight:700;color:#e6edf3;}
         .logo-sub{font-size:10px;color:#8b949e;margin-top:1px;}
         .hstats{display:flex;gap:22px;align-items:center;}
@@ -38,11 +38,11 @@
         .ctrl-row{display:flex;gap:6px;margin-bottom:7px;}
         .ctrl-btn{flex:1;padding:6px 8px;background:#21262d;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;font-size:11px;cursor:pointer;font-family:inherit;transition:all .2s;text-align:center;}
         .ctrl-btn:hover{background:#30363d;}
-        .ctrl-btn.active{background:#1d4ed8;border-color:#3b82f6;color:#fff;}
+        .ctrl-btn.active{background:#7c3aed;border-color:#a855f7;color:#fff;}
         .scale-box{background:#161b22;border:1px solid #21262d;border-radius:8px;padding:10px;margin-top:8px;}
         .scale-title{font-size:10px;color:#8b949e;margin-bottom:7px;font-weight:600;}
         .scale-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
-        .scale-block{background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:2px;}
+        .scale-block{background:linear-gradient(135deg,#7c3aed,#0891b2);border-radius:2px;}
         .scale-label{font-size:10px;color:#8b949e;}
 
         #tooltip{position:fixed;background:rgba(13,17,23,.97);border:1px solid #30363d;border-radius:10px;padding:13px;z-index:200;pointer-events:none;display:none;max-width:260px;backdrop-filter:blur(8px);}
@@ -50,7 +50,6 @@
         .tt-budget{font-size:15px;font-weight:700;color:#3fb950;margin:5px 0 3px;}
         .tt-row{display:flex;justify-content:space-between;font-size:11px;color:#8b949e;padding:1px 0;}
         .tt-val{color:#58a6ff;font-weight:600;}
-        .tt-floor{font-size:10px;color:#6e7681;margin-top:5px;border-top:1px solid #21262d;padding-top:5px;}
 
         #info-panel{position:fixed;right:16px;bottom:16px;background:rgba(13,17,23,.97);border:1px solid #30363d;border-radius:12px;padding:16px;z-index:100;backdrop-filter:blur(8px);width:280px;display:none;}
         .ip-close{position:absolute;top:10px;right:12px;background:none;border:none;color:#8b949e;cursor:pointer;font-size:16px;line-height:1;}
@@ -58,14 +57,9 @@
         .ip-budget{font-size:18px;font-weight:700;color:#3fb950;margin:6px 0 4px;}
         .ip-row{font-size:11px;color:#8b949e;padding:2px 0;display:flex;justify-content:space-between;}
         .ip-val{color:#c9d1d9;}
-        .ip-floors{margin-top:8px;max-height:200px;overflow-y:auto;}
-        .ip-floor-item{display:flex;align-items:center;gap:6px;font-size:10px;padding:3px 0;border-bottom:1px solid #21262d;}
-        .ip-floor-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
-        .ip-floor-name{color:#8b949e;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-        .ip-floor-bud{color:#58a6ff;font-weight:600;white-space:nowrap;}
 
         #loading{position:fixed;inset:0;background:#0d1117;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
-        .ld-spinner{width:48px;height:48px;border:3px solid #21262d;border-top-color:#2563eb;border-radius:50%;animation:spin .8s linear infinite;}
+        .ld-spinner{width:48px;height:48px;border:3px solid #21262d;border-top-color:#7c3aed;border-radius:50%;animation:spin .8s linear infinite;}
         @keyframes spin{to{transform:rotate(360deg);}}
         .ld-text{color:#8b949e;font-size:14px;}
         #help{position:fixed;bottom:16px;left:16px;font-size:10px;color:#484f58;z-index:100;line-height:2;}
@@ -74,25 +68,25 @@
 <body>
     <div id="loading">
         <div class="ld-spinner"></div>
-        <div class="ld-text">3D 예산도시 구성 중...</div>
+        <div class="ld-text">R&D 예산 3D 도시 구성 중...</div>
     </div>
 
     <div id="canvas-container"></div>
 
     <div id="header">
         <div class="logo">
-            <div class="logo-icon">🏙</div>
+            <div class="logo-icon">🔬</div>
             <div>
-                <div class="logo-text">2026년 정부 예산 3D 예산도시</div>
-                <div class="logo-sub">바닥 = 분야별 트리맵 · 건물 = 단위사업 · 층 = 세부사업 · 높이 = log(예산)</div>
+                <div class="logo-text">2026년 R&D 예산 3D 도시</div>
+                <div class="logo-sub">바닥 = 분야별 트리맵 · 건물 = R&D 사업 · 높이 = log(예산)</div>
             </div>
         </div>
         <div class="hstats">
-            <div class="hstat"><div class="hstat-val" id="h-budget">-</div><div class="hstat-label">총예산 (조원)</div></div>
+            <div class="hstat"><div class="hstat-val" id="h-budget">-</div><div class="hstat-label">총 R&D 예산 (조원)</div></div>
             <div class="hstat"><div class="hstat-val" id="h-field">-</div><div class="hstat-label">분야</div></div>
-            <div class="hstat"><div class="hstat-val" id="h-bldg">-</div><div class="hstat-label">단위사업</div></div>
-            <div class="hstat"><div class="hstat-val" id="h-sub">-</div><div class="hstat-label">세부사업</div></div>
-            <a href="index.html" class="back-btn">← 대시보드</a>
+            <div class="hstat"><div class="hstat-val" id="h-bldg">-</div><div class="hstat-label">R&D 사업</div></div>
+            <div class="hstat"><div class="hstat-val" id="h-sub">-</div><div class="hstat-label">참여 부처</div></div>
+            <a href="rnd_budget.html" class="back-btn">← 뒤로가기</a>
         </div>
     </div>
 
@@ -134,35 +128,21 @@
     // ══════════════════════════════
     // 상수
     // ══════════════════════════════
-    const GROUND_SIZE = 3200;
+    const GROUND_SIZE = 2800;
     const GROUND_HALF = GROUND_SIZE / 2;
 
     const FIELD_COLORS_INT = {
-        '일반·지방행정':0x4f46e5,'공공질서및안전':0xdc2626,'통일·외교':0x0891b2,
-        '국방':0x4b5563,'교육':0x2563eb,'문화및관광':0xdb2777,'환경':0x059669,
-        '사회복지':0x7c3aed,'보건':0xea580c,'농림수산':0x65a30d,
-        '산업·중소기업및에너지':0xd97706,'교통및물류':0x0d9488,'통신':0x9333ea,
-        '국토및지역개발':0x1d4ed8,'과학기술':0x10b981,'예비비':0x6b7280
+        '과학기술':0x7c3aed,'산업·중소기업및에너지':0xd97706,
+        '교통및물류':0x0d9488,'공공질서및안전':0xdc2626,
+        '농림수산':0x65a30d,'일반·지방행정':0x4f46e5,'통일·외교':0x0891b2,
+        '기타':0x6b7280
     };
     const FIELD_COLORS_HEX = {
-        '일반·지방행정':'#4f46e5','공공질서및안전':'#dc2626','통일·외교':'#0891b2',
-        '국방':'#4b5563','교육':'#2563eb','문화및관광':'#db2777','환경':'#059669',
-        '사회복지':'#7c3aed','보건':'#ea580c','농림수산':'#65a30d',
-        '산업·중소기업및에너지':'#d97706','교통및물류':'#0d9488','통신':'#9333ea',
-        '국토및지역개발':'#1d4ed8','과학기술':'#10b981','예비비':'#6b7280'
+        '과학기술':'#7c3aed','산업·중소기업및에너지':'#d97706',
+        '교통및물류':'#0d9488','공공질서및안전':'#dc2626',
+        '농림수산':'#65a30d','일반·지방행정':'#4f46e5','통일·외교':'#0891b2',
+        '기타':'#6b7280'
     };
-    const FLOOR_PALETTE_INT = [
-        0x3b82f6,0xf59e0b,0x10b981,0xef4444,0xa855f7,
-        0xf97316,0x06b6d4,0xec4899,0x84cc16,0x6366f1,
-        0xfbbf24,0x34d399,0xc084fc,0xfb923c,0x22d3ee,
-        0xf472b6,0xa3e635,0x60a5fa,0xfda4af,0x86efac
-    ];
-    const FLOOR_PALETTE_HEX = [
-        '#3b82f6','#f59e0b','#10b981','#ef4444','#a855f7',
-        '#f97316','#06b6d4','#ec4899','#84cc16','#6366f1',
-        '#fbbf24','#34d399','#c084fc','#fb923c','#22d3ee',
-        '#f472b6','#a3e635','#60a5fa','#fda4af','#86efac'
-    ];
 
     // ══════════════════════════════
     // 상태
@@ -175,126 +155,76 @@
     let hiddenFields = new Set();
     let isDragging = false, isRightDragging = false;
     let lastMouse = {x:0, y:0};
-    let spherical = {theta: Math.PI/5, phi: Math.PI/3.2, radius: 4500};
+    let spherical = {theta: Math.PI/5, phi: Math.PI/3.2, radius: 4200};
     let target = {x:0, y:0, z:0};
 
-    function fmtBudget(v) {
-        if (v >= 1000000) return (v/1000000).toFixed(2) + '조원';
-        if (v >= 100000)  return (v/100000).toFixed(1) + '천억원';
-        if (v >= 10000)   return (v/100).toFixed(0) + '억원';
-        if (v >= 100)     return (v/100).toFixed(1) + '억원';
-        return Math.round(v).toLocaleString() + '백만원';
+    // ══════════════════════════════
+    // 유틸
+    // ══════════════════════════════
+    function fmtBudget(bud) {
+        // bud: 천원 단위
+        const eok = bud / 100000;
+        if (eok >= 10000) return (eok/10000).toFixed(1) + '조원';
+        if (eok >= 1) return eok.toFixed(0) + '억원';
+        return (bud/1000).toFixed(0) + '백만원';
     }
 
     function calcHeight(bud) {
-        return Math.max(6, Math.log(1 + bud / 300) * 28);
+        // bud: 천원 단위. 1억원 = 100,000천원
+        if (!bud || bud <= 0) return 8;
+        const val = bud / 100000; // 억원 단위로 변환
+        return Math.max(8, Math.min(600, Math.log10(val + 1) * 120));
     }
 
     // ══════════════════════════════
-    // Squarified Treemap 알고리즘
+    // Squarify 알고리즘 (x,y,w,h 방식)
     // ══════════════════════════════
-    function tmWorst(areas, short) {
-        if (!areas.length || short <= 0) return Infinity;
-        const s = areas.reduce((a, b) => a + b, 0);
-        if (s <= 0) return Infinity;
-        let rmax = -Infinity, rmin = Infinity;
-        for (const a of areas) { if (a > rmax) rmax = a; if (a < rmin) rmin = a; }
-        return Math.max(short * short * rmax / (s * s), s * s / (short * short * rmin));
-    }
-
-    function tmLayoutRow(items, norm, idx, x0, z0, x1, z1) {
-        if (idx >= items.length) return;
-        const W = x1 - x0, H = z1 - z0;
-        if (W < 0.5 || H < 0.5) {
-            for (let i = idx; i < items.length; i++) {
-                items[i].rx0 = x0; items[i].rz0 = z0;
-                items[i].rx1 = x1; items[i].rz1 = z1;
+    function squarify(items, x, y, w, h) {
+        if (!items.length) return [];
+        if (items.length === 1) return [{...items[0], x, y, w, h}];
+        const shortSide = Math.min(w, h);
+        const horizontal = w >= h;
+        let rowItems = [], best = Infinity;
+        for (let i = 0; i < items.length; i++) {
+            rowItems.push(items[i]);
+            const rowArea = rowItems.reduce((s,r) => s+r.area, 0);
+            const rowLen = rowArea / shortSide;
+            const worst = Math.max(...rowItems.map(r => {
+                const rw = horizontal ? rowLen : r.area/rowLen;
+                const rh = horizontal ? r.area/rowLen : rowLen;
+                return Math.max(rw/rh, rh/rw);
+            }));
+            if (worst > best) {
+                rowItems.pop();
+                break;
             }
-            return;
+            best = worst;
         }
-        const short = Math.min(W, H);
-        const totalNorm = norm.slice(idx).reduce((s, v) => s + v, 0);
-        if (totalNorm <= 0) return;
-
-        let rowAreas = [norm[idx]];
-        for (let j = idx + 1; j < items.length; j++) {
-            const cand = rowAreas.concat(norm[j]);
-            if (tmWorst(rowAreas, short) >= tmWorst(cand, short)) {
-                rowAreas.push(norm[j]);
-            } else break;
+        const rowArea = rowItems.reduce((s,r) => s+r.area, 0);
+        const rowLen = rowArea / shortSide;
+        let pos = horizontal ? x : y;
+        const results = [];
+        rowItems.forEach(r => {
+            const len = r.area / rowLen;
+            if (horizontal) results.push({...r, x:pos, y, w:len, h:rowLen});
+            else results.push({...r, x, y:pos, w:rowLen, h:len});
+            pos += len;
+        });
+        const remaining = items.slice(rowItems.length);
+        if (remaining.length) {
+            const nx = horizontal ? x : x + rowLen;
+            const ny = horizontal ? y + rowLen : y;
+            const nw = horizontal ? w : w - rowLen;
+            const nh = horizontal ? h - rowLen : h;
+            results.push(...squarify(remaining, nx, ny, nw, nh));
         }
-
-        const rowSum = rowAreas.reduce((s, v) => s + v, 0);
-        const isHoriz = W >= H;
-        const rowWidth = rowSum / totalNorm * (isHoriz ? W : H);
-        let pos = isHoriz ? z0 : x0;
-
-        rowAreas.forEach((a, k) => {
-            const itemLen = rowSum > 0 ? a / rowSum * short : 0;
-            const i = idx + k;
-            if (isHoriz) {
-                items[i].rx0 = x0;         items[i].rz0 = pos;
-                items[i].rx1 = x0 + rowWidth; items[i].rz1 = pos + itemLen;
-            } else {
-                items[i].rx0 = pos;         items[i].rz0 = z0;
-                items[i].rx1 = pos + itemLen; items[i].rz1 = z0 + rowWidth;
-            }
-            pos += itemLen;
-        });
-
-        const nextIdx = idx + rowAreas.length;
-        if (isHoriz) tmLayoutRow(items, norm, nextIdx, x0 + rowWidth, z0, x1, z1);
-        else         tmLayoutRow(items, norm, nextIdx, x0, z0 + rowWidth, x1, z1);
-    }
-
-    function squarifyLayout(items, x0, z0, x1, z1) {
-        if (!items.length) return;
-        items.sort((a, b) => b.value - a.value);
-        const total = items.reduce((s, i) => s + i.value, 0);
-        if (total <= 0) return;
-        const area = (x1 - x0) * (z1 - z0);
-        const norm = items.map(i => i.value / total * area);
-        tmLayoutRow(items, norm, 0, x0, z0, x1, z1);
-    }
-
-    // ══════════════════════════════
-    // 레이아웃 계산 (분야 → 단위사업)
-    // ══════════════════════════════
-    function computeLayouts() {
-        const fieldBudgets = {}, fieldMap = {};
-        mapData.buildings.forEach(b => {
-            fieldBudgets[b.field] = (fieldBudgets[b.field] || 0) + b.bud;
-            if (!fieldMap[b.field]) fieldMap[b.field] = [];
-            fieldMap[b.field].push(b);
-        });
-
-        // 분야 트리맵
-        const fItems = Object.entries(fieldBudgets).map(([name, value]) => ({name, value}));
-        const GH = GROUND_HALF;
-        squarifyLayout(fItems, -GH, -GH, GH, GH);
-        fieldLayouts = fItems;
-
-        // 각 분야 내 단위사업 트리맵
-        const PAD = 18;
-        fItems.forEach(f => {
-            const blds = fieldMap[f.name] || [];
-            const bItems = blds.map(b => ({ref: b, value: Math.max(b.bud, 1)}));
-            if (!bItems.length) return;
-            squarifyLayout(bItems, f.rx0 + PAD, f.rz0 + PAD, f.rx1 - PAD, f.rz1 - PAD);
-            bItems.forEach(bi => {
-                const b = bi.ref;
-                const cw = bi.rx1 - bi.rx0, ch = bi.rz1 - bi.rz0;
-                b.x = (bi.rx0 + bi.rx1) / 2;
-                b.z = (bi.rz0 + bi.rz1) / 2;
-                b.bs = Math.max(4, Math.min(55, Math.min(cw, ch) * 0.72));
-            });
-        });
+        return results;
     }
 
     // ══════════════════════════════
     // Three.js 초기화
     // ══════════════════════════════
-    function initThree() {
+    function initScene() {
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0d1117);
         scene.fog = new THREE.Fog(0x0d1117, 3000, 7000);
@@ -407,10 +337,11 @@
     // ══════════════════════════════
     // 분야 트리맵 바닥 생성
     // ══════════════════════════════
-    function fmtBudgetLabel(f) {
-        const total = mapData.buildings.filter(b => b.field === f.name).reduce((s,b) => s+b.bud, 0);
-        const jo = (total/1000000).toFixed(1);
-        return jo + '조원';
+    function fmtBudgetLabel(fieldName) {
+        const total = mapData.buildings.filter(b => b.field === fieldName).reduce((s,b) => s+b.bud, 0);
+        const eok = total / 100000;
+        if (eok >= 10000) return (eok/10000).toFixed(1) + '조원';
+        return eok.toFixed(0) + '억원';
     }
 
     function makeLabel(text, subText, color, w, h) {
@@ -466,7 +397,7 @@
             fieldFloorMeshes.push(border);
 
             // 분야명 라벨 스프라이트
-            const labelCanvas = makeLabel(f.name, fmtBudgetLabel(f), colorHex, fw, fh);
+            const labelCanvas = makeLabel(f.name, fmtBudgetLabel(f.name), colorHex, fw, fh);
             const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
                 map: new THREE.CanvasTexture(labelCanvas),
                 transparent: true, opacity: 0.92
@@ -480,59 +411,30 @@
     }
 
     // ══════════════════════════════
-    // 단위사업 건물 (세부사업 층 적층)
+    // R&D 사업 건물 (단일 박스)
     // ══════════════════════════════
     function createBuildings() {
         mapData.buildings.forEach(b => {
             if (b.x == null) return;
             const totalHeight = calcHeight(b.bud);
-            const floors = b.bl.length > 0 ? b.bl : [{name: b.name, bud: b.bud}];
-            const totalFloorBud = floors.reduce((s, f) => s + f.bud, 0);
-            const bs = b.bs || 8;
+            const colorInt = FIELD_COLORS_INT[b.field] || 0x6b7280;
+            const sw = b.sw || 30, sh = b.sh || 30;
 
-            let yOffset = 0;
-            const meshes = [];
+            const geo = new THREE.BoxGeometry(sw, totalHeight, sh);
+            const mat = new THREE.MeshLambertMaterial({ color: colorInt });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(b.x, totalHeight/2, b.z);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            mesh.userData = { type:'building', data: b };
+            scene.add(mesh);
+            buildingMeshGroups.push({ meshes:[mesh], data:b });
 
-            floors.forEach((floor, fi) => {
-                const floorH = totalFloorBud > 0
-                    ? Math.max(1, (floor.bud / totalFloorBud) * totalHeight)
-                    : totalHeight / floors.length;
-                const colorInt = FLOOR_PALETTE_INT[fi % FLOOR_PALETTE_INT.length];
-
-                const mesh = new THREE.Mesh(
-                    new THREE.BoxGeometry(bs, floorH, bs),
-                    new THREE.MeshLambertMaterial({color: colorInt, transparent: true, opacity: 0.88})
-                );
-                mesh.position.set(b.x, yOffset + floorH / 2, b.z);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                mesh.userData = {building: b, floorIdx: fi, floorName: floor.name, floorBud: floor.bud};
-                scene.add(mesh);
-                meshes.push(mesh);
-                yOffset += floorH;
-
-                // 층 구분선
-                if (fi < floors.length - 1 && floorH > 2) {
-                    const sep = new THREE.Mesh(
-                        new THREE.BoxGeometry(bs + 0.3, 0.5, bs + 0.3),
-                        new THREE.MeshBasicMaterial({color: 0x0d1117, transparent: true, opacity: 0.55})
-                    );
-                    sep.position.set(b.x, yOffset, b.z);
-                    scene.add(sep);
-                }
-            });
-
-            // 옥상 (분야 색)
-            const roof = new THREE.Mesh(
-                new THREE.BoxGeometry(bs + 0.6, 1.4, bs + 0.6),
-                new THREE.MeshLambertMaterial({color: FIELD_COLORS_INT[b.field] || 0x6b7280, transparent: true, opacity: 0.95})
-            );
-            roof.position.set(b.x, yOffset + 0.7, b.z);
-            roof.userData = {building: b, floorIdx: -1, floorName: '옥상', floorBud: b.bud};
-            scene.add(roof);
-            meshes.push(roof);
-
-            buildingMeshGroups.push({data: b, meshes});
+            // 엣지
+            const edges = new THREE.EdgesGeometry(geo);
+            const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color:0xffffff, transparent:true, opacity:0.12}));
+            line.position.copy(mesh.position);
+            scene.add(line);
         });
     }
 
@@ -550,7 +452,7 @@
         fieldFloorMeshes.forEach(m => m.visible = showFloors);
     }
     function resetCamera() {
-        spherical = {theta: Math.PI / 5, phi: Math.PI / 3.2, radius: 4500};
+        spherical = {theta: Math.PI / 5, phi: Math.PI / 3.2, radius: 4200};
         target = {x: 0, y: 0, z: 0};
         updateCamera();
     }
@@ -583,60 +485,50 @@
         return hits.length ? hits[0] : null;
     }
 
+    function showTooltip(e, data) {
+        const t = document.getElementById('tooltip');
+        t.innerHTML = `
+            <div class="tt-name">${data.name}</div>
+            <div class="tt-budget">${fmtBudget(data.bud)}</div>
+            <div class="tt-row"><span>부처</span><span class="tt-val">${data.ministry||'-'}</span></div>
+            <div class="tt-row"><span>분야</span><span class="tt-val">${data.field||'-'}</span></div>
+            <div class="tt-row"><span>부문</span><span class="tt-val">${data.subfield||'-'}</span></div>
+        `;
+        t.style.display = 'block';
+        t.style.left = (e.clientX+12)+'px';
+        t.style.top = (e.clientY-10)+'px';
+    }
+
     function updateTooltip(e) {
         const hit = getRaycastHit(e);
         const tt = document.getElementById('tooltip');
         if (!hit) { tt.style.display = 'none'; return; }
-        const {building, floorIdx, floorName, floorBud} = hit.object.userData;
-        if (!building) { tt.style.display = 'none'; return; }
-        const fc = FIELD_COLORS_HEX[building.field] || '#6b7280';
-        let floorInfo = '';
-        if (floorIdx >= 0) {
-            const fc2 = FLOOR_PALETTE_HEX[floorIdx % FLOOR_PALETTE_HEX.length];
-            floorInfo = `<div class="tt-floor"><span style="color:${fc2}">■</span> 세부사업: ${floorName} (${fmtBudget(floorBud)})</div>`;
-        }
-        tt.style.display = 'block';
-        tt.style.left = (e.clientX + 16) + 'px';
-        tt.style.top = Math.min(e.clientY - 10, window.innerHeight - 170) + 'px';
-        tt.innerHTML = `
-            <div class="tt-name">${building.name}</div>
-            <div class="tt-budget">${fmtBudget(building.bud)}</div>
-            <div class="tt-row"><span>소관부처</span><span class="tt-val">${building.min}</span></div>
-            <div class="tt-row"><span>분야</span><span class="tt-val" style="color:${fc}">${building.field}</span></div>
-            <div class="tt-row"><span>세부사업 수</span><span class="tt-val">${building.bl.length}개 층</span></div>
-            ${floorInfo}`;
+        const data = hit.object.userData.data;
+        if (!data) { tt.style.display = 'none'; return; }
+        showTooltip(e, data);
     }
 
     function handleClick(e) {
         const hit = getRaycastHit(e);
         if (!hit) { closeInfo(); return; }
-        const {building} = hit.object.userData;
-        if (!building) return;
-        const fc = FIELD_COLORS_HEX[building.field] || '#6b7280';
-        const floors = building.bl.length > 0 ? building.bl : [{name: building.name, bud: building.bud}];
-        const floorsHtml = floors.map((f, i) => {
-            const fc2 = FLOOR_PALETTE_HEX[i % FLOOR_PALETTE_HEX.length];
-            return `<div class="ip-floor-item">
-                <div class="ip-floor-dot" style="background:${fc2}"></div>
-                <div class="ip-floor-name">${f.name}</div>
-                <div class="ip-floor-bud">${fmtBudget(f.bud)}</div>
-            </div>`;
-        }).join('');
+        const data = hit.object.userData.data;
+        if (!data) return;
+        const fc = FIELD_COLORS_HEX[data.field] || '#6b7280';
         document.getElementById('ip-content').innerHTML = `
-            <div class="ip-title">${building.name}</div>
-            <div class="ip-budget">${fmtBudget(building.bud)}</div>
-            <div class="ip-row"><span>소관부처</span><span class="ip-val">${building.min}</span></div>
-            <div class="ip-row"><span>분야</span><span class="ip-val" style="color:${fc}">${building.field}</span></div>
-            <div class="ip-row"><span>부문</span><span class="ip-val">${building.subfield || ''}</span></div>
-            <div class="ip-row"><span>세부사업(층) 수</span><span class="ip-val">${floors.length}개</span></div>
-            ${floors.length > 0 ? `<div style="margin-top:8px;font-size:10px;color:#6e7681;margin-bottom:2px">층별 세부사업 (아래→위)</div><div class="ip-floors">${floorsHtml}</div>` : ''}`;
+            <div class="ip-title">${data.name}</div>
+            <div class="ip-budget">${fmtBudget(data.bud)}</div>
+            <div class="ip-row"><span>부처</span><span class="ip-val">${data.ministry||'-'}</span></div>
+            <div class="ip-row"><span>분야</span><span class="ip-val" style="color:${fc}">${data.field||'-'}</span></div>
+            <div class="ip-row"><span>부문</span><span class="ip-val">${data.subfield||'-'}</span></div>
+            <div class="ip-row"><span>프로그램</span><span class="ip-val">${data.program||'-'}</span></div>
+        `;
         document.getElementById('info-panel').style.display = 'block';
 
         // 선택 강조
         buildingMeshGroups.forEach(g => g.meshes.forEach(m => {
             if (m.material && m.material.emissive) { m.material.emissive.set(0x000000); m.material.emissiveIntensity = 0; }
         }));
-        const grp = buildingMeshGroups.find(g => g.data === building);
+        const grp = buildingMeshGroups.find(g => g.data === data);
         if (grp) grp.meshes.forEach(m => {
             if (m.material && m.material.emissive) { m.material.emissive.set(0xffffff); m.material.emissiveIntensity = 0.28; }
         });
@@ -655,7 +547,7 @@
     function buildLegend() {
         const fieldCount = {};
         mapData.buildings.forEach(b => { fieldCount[b.field] = (fieldCount[b.field] || 0) + 1; });
-        const sorted = [...fieldLayouts].sort((a, b) => b.value - a.value);
+        const sorted = [...fieldLayouts].sort((a, b) => b.budget - a.budget);
         const list = document.getElementById('legend-list');
         sorted.forEach(f => {
             const fc = FIELD_COLORS_HEX[f.name] || '#6b7280';
@@ -678,21 +570,71 @@
     }
 
     // ══════════════════════════════
-    // 초기화
+    // 데이터 로드 및 초기화
     // ══════════════════════════════
-    async function init() {
-        const res = await fetch('map3d.json');
-        mapData = await res.json();
+    async function loadData() {
+        const res = await fetch('rnd_budget.json?v=' + Date.now());
+        const items = await res.json();
 
-        const totalBudget = mapData.buildings.reduce((s, b) => s + b.bud, 0);
-        const totalSub    = mapData.buildings.reduce((s, b) => s + b.bl.length, 0);
-        document.getElementById('h-budget').textContent = (totalBudget / 1000000).toFixed(1);
-        document.getElementById('h-field').textContent  = new Set(mapData.buildings.map(b => b.field)).size;
-        document.getElementById('h-bldg').textContent   = mapData.buildings.length.toLocaleString();
-        document.getElementById('h-sub').textContent    = totalSub.toLocaleString();
+        // 분야별 집계
+        const fieldMap = {};
+        items.forEach(item => {
+            const f = item.field || '기타';
+            if (!fieldMap[f]) fieldMap[f] = { name: f, budget: 0, items: [] };
+            fieldMap[f].budget += item.budget;
+            fieldMap[f].items.push(item);
+        });
 
-        computeLayouts();
-        initThree();
+        const total = items.reduce((s,d) => s+d.budget, 0);
+        const GS = GROUND_SIZE;
+
+        // 분야 treemap 레이아웃
+        const fieldList = Object.values(fieldMap).sort((a,b) => b.budget - a.budget);
+        const fieldItems = fieldList.map(f => ({ ...f, area: (f.budget/total)*GS*GS }));
+        const fieldRects = squarify(fieldItems, -GS/2, -GS/2, GS, GS);
+
+        // fieldLayouts 생성 (rx0/rz0/rx1/rz1 형식)
+        fieldLayouts = fieldRects.map(fr => ({
+            name: fr.name,
+            budget: fr.budget,
+            rx0: fr.x, rz0: fr.y, rx1: fr.x+fr.w, rz1: fr.y+fr.h
+        }));
+
+        // 건물 배치: 각 분야 안에서 items를 squarify
+        const buildings = [];
+        fieldRects.forEach(fr => {
+            const fitems = fr.items.sort((a,b) => b.budget - a.budget);
+            const ftotal = fitems.reduce((s,d) => s+d.budget, 0);
+            if (!ftotal) return;
+            const bItems = fitems.map(d => ({ ...d, area: (d.budget/ftotal)*fr.w*fr.h }));
+            const bRects = squarify(bItems, fr.x, fr.y, fr.w, fr.h);
+            bRects.forEach(br => {
+                buildings.push({
+                    id: br.id,
+                    name: br.name,
+                    ministry: br.ministry,
+                    field: br.field,
+                    subfield: br.subfield,
+                    program: br.program,
+                    bud: br.budget,
+                    bl: [],
+                    x: (br.x + br.w/2),
+                    z: (br.y + br.h/2),
+                    sw: Math.max(8, br.w - 6),
+                    sh: Math.max(8, br.h - 6)
+                });
+            });
+        });
+
+        mapData = { buildings };
+
+        // 헤더 통계
+        document.getElementById('h-budget').textContent = (total/1000000000).toFixed(2);
+        document.getElementById('h-field').textContent = fieldList.length;
+        document.getElementById('h-bldg').textContent = items.length.toLocaleString();
+        document.getElementById('h-sub').textContent = Object.keys(Object.fromEntries(items.map(d=>[d.ministry,1]))).length;
+
+        initScene();
         createFieldFloors();
         createBuildings();
         buildLegend();
@@ -700,7 +642,7 @@
         document.getElementById('loading').style.display = 'none';
     }
 
-    init().catch(console.error);
+    loadData().catch(console.error);
     </script>
 </body>
 </html>
