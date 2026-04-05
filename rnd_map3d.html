@@ -78,7 +78,7 @@
             <div class="logo-icon">🔬</div>
             <div>
                 <div class="logo-text">2026년 R&D 예산 3D 도시</div>
-                <div class="logo-sub">바닥 = 분야별 구역 · 건물 = R&D 사업 · 높이·크기 = log(예산)</div>
+                <div class="logo-sub">바닥 = 분야별 정사각형(면적 ∝ 사업 수) · 건물 높이·크기 = log(예산)</div>
             </div>
         </div>
         <div class="hstats">
@@ -180,13 +180,16 @@
     function squarify(items, x, y, w, h) {
         if (!items.length) return [];
         if (items.length === 1) return [{...items[0], x, y, w, h}];
-        const shortSide = Math.min(w, h);
         const horizontal = w >= h;
+        // stripLen: 행이 뻗어나가는 방향의 길이 (긴 변)
+        // 재귀 후 직사각형이 되어도 항상 긴 변을 기준으로 나눔 →
+        // 각 행이 전체 폭/높이를 채우므로 삼각형 분포 없이 균등 배치됨
+        const stripLen = horizontal ? w : h;
         let rowItems = [], best = Infinity;
         for (let i = 0; i < items.length; i++) {
             rowItems.push(items[i]);
             const rowArea = rowItems.reduce((s,r) => s+r.area, 0);
-            const rowLen = rowArea / shortSide;
+            const rowLen = rowArea / stripLen;
             const worst = Math.max(...rowItems.map(r => {
                 const rw = horizontal ? rowLen : r.area/rowLen;
                 const rh = horizontal ? r.area/rowLen : rowLen;
@@ -199,7 +202,7 @@
             best = worst;
         }
         const rowArea = rowItems.reduce((s,r) => s+r.area, 0);
-        const rowLen = rowArea / shortSide;
+        const rowLen = rowArea / stripLen;
         let pos = horizontal ? x : y;
         const results = [];
         rowItems.forEach(r => {
@@ -220,69 +223,62 @@
     }
 
     // ══════════════════════════════
-    // 중앙 우선 분야 배치
-    // sorted: 빌딩 수 내림차순 정렬된 분야 배열
-    // → 가장 많은 분야를 중앙에, 나머지를 상·하·좌·우 4방향으로 분산
+    // 분야별 정사각형 패킹
+    //
+    // 핵심 수학:
+    //   side_i = √(bsArea_i × FIELD_PADDING)
+    //   → 분야 정사각형 면적 = bsArea_i × FIELD_PADDING
+    //   → 각 빌딩의 squarify 셀 면적 = bs_j² × FIELD_PADDING
+    //   → 셀 한 변 ≈ bs_j × √FIELD_PADDING  (FIELD_PADDING=4 이면 2×bs_j)
+    //   → 빌딩(bs_j × bs_j)이 셀 안에 완전히 포함됨 ✓
+    //   → squarify 종횡비가 최대 2:1 이어도 단변 = bs_j×√2 > bs_j ✓
+    //
+    // - 빌딩 없는 분야: MIN_SIDE 최소 정사각형
+    // - 내림차순 정렬 후 행(strip) 패킹 → 겹침 없이 인접 배치
+    // - 반환: { rects, GS }
     // ══════════════════════════════
-    function buildCenterLayout(sorted, GS) {
-        if (!sorted.length) return [];
-        if (sorted.length === 1) {
-            return [{ ...sorted[0], x: -GS/2, y: -GS/2, w: GS, h: GS }];
-        }
+    function packFieldSquares(fieldList) {
+        const FIELD_PADDING = 4.0; // 빌딩이 정사각형 안에 완전히 들어오게 하는 여유 계수
+        const MIN_SIDE = 60;       // 빌딩 없는 분야의 최소 정사각형 변 길이
 
-        const totalCount = sorted.reduce((s,f) => s + f.count, 0);
-        const cf = sorted[0];
-        const rest = sorted.slice(1);
-        const restCount = rest.reduce((s,f) => s + f.count, 0);
+        // 각 분야의 정사각형 변 길이: side = √(bsArea × FIELD_PADDING)
+        const squares = fieldList.map(f => ({
+            ...f,
+            side: Math.max(MIN_SIDE, Math.sqrt(Math.max(1, f.bsArea) * FIELD_PADDING))
+        })).sort((a, b) => b.side - a.side); // 내림차순 정렬
 
-        // 중앙 분야 크기: 개수 비율의 제곱근 × GS
-        const cfRatio = cf.count / totalCount;
-        const cfSize = GS * Math.sqrt(cfRatio);
-        const halfSide = (GS - cfSize) / 2;
+        // 목표 행 폭 = √(총 면적) → 전체 배치가 정사각형에 가깝도록
+        const rowWidth = Math.sqrt(squares.reduce((s, sq) => s + sq.side * sq.side, 0));
 
-        const results = [{ ...cf, x: -cfSize/2, y: -cfSize/2, w: cfSize, h: cfSize }];
-        if (!rest.length) return results;
-
-        // 4방향 띠 정의 (상·하는 전체 폭, 좌·우는 중앙 높이만)
-        //   [  TOP (전체 폭)  ]
-        //   [L][  CENTER  ][R]
-        //   [ BOTTOM (전체 폭)]
-        const strips = [
-            { x: -GS/2,    y: -GS/2,     w: GS,      h: halfSide, items: [] }, // 상
-            { x: -GS/2,    y: cfSize/2,  w: GS,      h: halfSide, items: [] }, // 하
-            { x: -GS/2,    y: -cfSize/2, w: halfSide, h: cfSize,  items: [] }, // 좌
-            { x: cfSize/2, y: -cfSize/2, w: halfSide, h: cfSize,  items: [] }, // 우
-        ].filter(s => s.w > 1 && s.h > 1);
-
-        // 각 띠의 목표 수용 개수 (면적 비례)
-        const totalStripArea = strips.reduce((s,st) => s + st.w * st.h, 0);
-        strips.forEach(st => {
-            st.targetCount = (st.w * st.h / totalStripArea) * restCount;
-            st.usedCount = 0;
+        // Strip 패킹: 좌→우 배치, 행 폭 초과 시 다음 행으로
+        const placed = [];
+        let curX = 0, curY = 0, rowH = 0;
+        squares.forEach(sq => {
+            if (curX > 0 && curX + sq.side > rowWidth * 1.01) {
+                curX = 0;
+                curY += rowH;
+                rowH = 0;
+            }
+            placed.push({ ...sq, _px: curX, _py: curY });
+            curX += sq.side;
+            rowH = Math.max(rowH, sq.side);
         });
 
-        // 그리디 배분: 잔여 용량이 가장 큰 띠에 순서대로 배정
-        rest.forEach(f => {
-            let best = 0, bestScore = -Infinity;
-            strips.forEach((st, i) => {
-                const score = st.targetCount - st.usedCount;
-                if (score > bestScore) { bestScore = score; best = i; }
-            });
-            strips[best].items.push(f);
-            strips[best].usedCount += f.count;
-        });
+        const layoutW = rowWidth;
+        const layoutH = curY + rowH;
+        const GS = Math.ceil(Math.max(layoutW, layoutH) * 1.06);
 
-        // 각 띠 안에서 squarify로 배치 (개수 비례 면적)
-        strips.forEach(st => {
-            if (!st.items.length) return;
-            const stTotal = st.items.reduce((s,f) => s + f.count, 0);
-            const sItems = st.items.map(f => ({
-                ...f, area: (f.count / stTotal) * st.w * st.h
-            }));
-            squarify(sItems, st.x, st.y, st.w, st.h).forEach(r => results.push(r));
-        });
-
-        return results;
+        // 원점(0,0) 중앙 정렬
+        return {
+            rects: placed.map(p => ({
+                ...p,
+                x: p._px - layoutW / 2,
+                y: p._py - layoutH / 2,
+                w: p.side,
+                h: p.side
+            })),
+            GS
+        };
     }
 
     // ══════════════════════════════
@@ -658,20 +654,14 @@
 
         const total = items.reduce((s,d) => s+d.budget, 0);
 
-        // 3단계: 도시 전체 크기 결정 (bs² 기반)
-        const FLOOR_PADDING = 2.2; // 바닥 여유
-        // 빌딩 개수 내림차순 정렬 → buildCenterLayout 에서 첫 번째가 중앙에 배치됨
+        // 3단계: 분야별 정사각형 패킹
+        //   - 각 분야 정사각형: side = √(분야 bsArea × 4.0) → 빌딩이 반드시 안에 들어옴
+        //   - 빌딩 개수 내림차순 정렬 후 행 패킹 → 겹침 없이 인접
         const fieldList = Object.values(fieldMap).sort((a,b) => b.count - a.count);
-        const totalBsArea = fieldList.reduce((s,f) => s + f.bsArea, 0);
-        const GS = Math.round(Math.sqrt(totalBsArea * FLOOR_PADDING) * 1.05);
+
+        const { rects: fieldRects, GS } = packFieldSquares(fieldList);
         GROUND_SIZE = GS;
         spherical.radius = GS * 1.5;
-
-        // 4단계: 중앙 우선 분야 배치
-        //   - 바닥 면적 ∝ 빌딩 개수
-        //   - 가장 많은 분야 → 중앙 정사각형
-        //   - 나머지 → 상·하·좌·우 4방향 띠
-        const fieldRects = buildCenterLayout(fieldList, GS);
 
         // fieldLayouts 생성 (rx0/rz0/rx1/rz1 형식)
         fieldLayouts = fieldRects.map(fr => ({
@@ -680,13 +670,14 @@
             rx0: fr.x, rz0: fr.y, rx1: fr.x+fr.w, rz1: fr.y+fr.h
         }));
 
-        // 5단계: 건물 배치 - bs² 비율로 squarify → 빈 공간 최소화
+        // 5단계: 건물 배치 - 모든 빌딩에 동일한 셀 면적 → 사각형 안에 균등 분포
+        // (bs²를 셀 면적으로 쓰면 대형 빌딩이 136배 넓은 셀을 차지해 한쪽으로 쏠림)
         const buildings = [];
         fieldRects.forEach(fr => {
-            const fitems = fr.items.sort((a,b) => b._bs - a._bs);
-            const ftotalBs = fitems.reduce((s,d) => s + d._bs * d._bs, 0);
-            if (!ftotalBs) return;
-            const bItems = fitems.map(d => ({ ...d, area: (d._bs * d._bs / ftotalBs) * fr.w * fr.h }));
+            const fitems = fr.items;
+            if (!fitems || !fitems.length) return;
+            const cellArea = (fr.w * fr.h) / fitems.length; // 균등 셀 면적
+            const bItems = fitems.map(d => ({ ...d, area: cellArea }));
             const bRects = squarify(bItems, fr.x, fr.y, fr.w, fr.h);
             bRects.forEach(br => {
                 const bs = br._bs;
