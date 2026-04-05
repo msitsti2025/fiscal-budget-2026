@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026년 R&D 예산 3D 도시</title>
+    <title>2026년 R&D 3D 예산 지도</title>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
@@ -77,7 +77,7 @@
         <div class="logo">
             <div class="logo-icon">🔬</div>
             <div>
-                <div class="logo-text">2026년 R&D 예산 3D 도시</div>
+                <div class="logo-text">2026년 R&D 3D 예산 지도</div>
                 <div class="logo-sub">바닥 = 분야별 정사각형(면적 ∝ 사업 수) · 건물 높이·크기 = log(예산)</div>
             </div>
         </div>
@@ -153,7 +153,7 @@
     let hiddenFields = new Set();
     let isDragging = false, isRightDragging = false;
     let lastMouse = {x:0, y:0};
-    let spherical = {theta: Math.PI/5, phi: Math.PI/3.2, radius: 2100};
+    let spherical = {theta: Math.PI/5, phi: Math.PI/3.2, radius: 850};
     let target = {x:0, y:0, z:0};
 
     // ══════════════════════════════
@@ -462,8 +462,8 @@
                 map: new THREE.CanvasTexture(labelCanvas),
                 transparent: true, opacity: 0.92
             }));
-            const labelW = Math.max(180, Math.min(380, fw * 0.7));
-            sprite.position.set(cx, 300, cz);
+            const labelW = Math.max(300, Math.min(620, fw * 1.1));
+            sprite.position.set(cx, 720, cz);
             sprite.scale.set(labelW, labelW * 160 / 512, 1);
             scene.add(sprite);
             labelSprites.push(sprite);
@@ -512,7 +512,7 @@
         fieldFloorMeshes.forEach(m => m.visible = showFloors);
     }
     function resetCamera() {
-        spherical = {theta: Math.PI / 5, phi: Math.PI / 3.2, radius: GROUND_SIZE * 1.5};
+        spherical = {theta: Math.PI / 5, phi: Math.PI / 3.2, radius: GROUND_SIZE * 0.9};
         target = {x: 0, y: 0, z: 0};
         updateCamera();
     }
@@ -661,7 +661,7 @@
 
         const { rects: fieldRects, GS } = packFieldSquares(fieldList);
         GROUND_SIZE = GS;
-        spherical.radius = GS * 1.5;
+        spherical.radius = GS * 0.9;
 
         // fieldLayouts 생성 (rx0/rz0/rx1/rz1 형식)
         fieldLayouts = fieldRects.map(fr => ({
