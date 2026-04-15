@@ -262,7 +262,7 @@
                 <table>
                     <thead><tr>
                         <th>분야</th>
-                        <th style="text-align:right">예산 (천원)</th>
+                        <th style="text-align:right">예산 (백만원)</th>
                         <th style="text-align:right">예산 (억원)</th>
                         <th style="text-align:right">비중</th>
                         <th>사업 수</th>
@@ -391,9 +391,9 @@ let allData = [];
 let charts = {};
 
 function fmt(n) { return Number(n).toLocaleString('ko-KR'); }
-// 예산 단위: 천원 (원본 Excel)
-function fmtEok(n) { return (n / 100000).toFixed(1); }   // 천원 → 억원
-function fmtJo(n)  { return (n / 1000000000).toFixed(2); } // 천원 → 조원
+// 예산 단위: 백만원 (data.json 기준)
+function fmtEok(n) { return (n / 100).toFixed(1); }       // 백만원 → 억원
+function fmtJo(n)  { return (n / 1000000).toFixed(2); }   // 백만원 → 조원
 
 async function init() {
     const res = await fetch('rnd_budget.json?v=' + Date.now());
@@ -436,7 +436,7 @@ function buildDashboard() {
         <div class="kpi-card purple">
             <div class="kpi-label">총 R&D 예산</div>
             <div class="kpi-value">${fmtJo(total)}<span class="kpi-unit">조원</span></div>
-            <div class="kpi-sub">${fmt(total)} 천원</div>
+            <div class="kpi-sub">${fmt(total)} 백만원</div>
         </div>
         <div class="kpi-card blue">
             <div class="kpi-label">총 R&D 사업 수</div>
@@ -466,7 +466,7 @@ function buildDashboard() {
     makeChart('chart-dash-ministry-pie', 'doughnut', minEntries.map(e=>e[0]), minEntries.map(e=>e[1]), {cutout:'55%'});
 
     // Ministry bar
-    makeChart('chart-dash-ministry-bar', 'bar', minEntries.map(e=>e[0]), minEntries.map(e=>e[1]/100000), {
+    makeChart('chart-dash-ministry-bar', 'bar', minEntries.map(e=>e[0]), minEntries.map(e=>e[1]/100), {
         horizontal: false,
         label: '예산(억원)',
         color: '#7c3aed'
@@ -507,7 +507,7 @@ function buildField() {
     document.getElementById('field-table-count').textContent = entries.length + '개 분야';
 
     // Bar chart
-    makeChart('chart-field-bar', 'bar', entries.map(e=>e[0]), entries.map(e=>e[1]/100000), {
+    makeChart('chart-field-bar', 'bar', entries.map(e=>e[0]), entries.map(e=>e[1]/100), {
         horizontal: false, label: '예산(억원)', color: '#7c3aed'
     });
     // Donut chart
@@ -549,7 +549,7 @@ function buildMinistry() {
 
     document.getElementById('ministry-table-count').textContent = entries.length + '개 부처';
 
-    makeChart('chart-ministry-bar', 'bar', entries.map(e=>e[0]), entries.map(e=>e[1]/100000), {
+    makeChart('chart-ministry-bar', 'bar', entries.map(e=>e[0]), entries.map(e=>e[1]/100), {
         horizontal: false, label: '예산(억원)', color: '#7c3aed'
     });
     makeChart('chart-ministry-pie', 'doughnut', entries.map(e=>e[0]), entries.map(e=>e[1]), {cutout:'55%'});
@@ -701,7 +701,7 @@ function makeChart(id, type, labels, values, opts={}) {
                             const v = ctx.parsed.y ?? ctx.parsed.x ?? ctx.parsed ?? 0;
                             if (isPie) {
                                 const total = ctx.dataset.data.reduce((s,n)=>s+n,0);
-                                return ` ${(v/100000).toFixed(1)}억원 (${(v/total*100).toFixed(1)}%)`;
+                                return ` ${(v/100).toFixed(1)}억원 (${(v/total*100).toFixed(1)}%)`;
                             }
                             return opts.isCount ? ` ${Math.round(v)}건` : ` ${Number(v).toFixed(1)}억원`;
                         }

@@ -160,17 +160,17 @@
     // 유틸
     // ══════════════════════════════
     function fmtBudget(bud) {
-        // bud: 천원 단위
-        const eok = bud / 100000;
+        // bud: 백만원 단위
+        const eok = bud / 100;
         if (eok >= 10000) return (eok/10000).toFixed(1) + '조원';
         if (eok >= 1) return eok.toFixed(0) + '억원';
-        return (bud/1000).toFixed(0) + '백만원';
+        return Math.round(bud).toLocaleString() + '백만원';
     }
 
     function calcHeight(bud) {
-        // bud: 천원 단위. 1억원 = 100,000천원
+        // bud: 백만원 단위. 1억원 = 100 백만원
         if (!bud || bud <= 0) return 8;
-        const val = bud / 100000; // 억원 단위로 변환
+        const val = bud / 100; // 억원 단위로 변환
         return Math.max(8, Math.min(600, Math.log10(val + 1) * 120));
     }
 
@@ -399,7 +399,7 @@
     // ══════════════════════════════
     function fmtBudgetLabel(fieldName) {
         const total = mapData.buildings.filter(b => b.field === fieldName).reduce((s,b) => s+b.bud, 0);
-        const eok = total / 100000;
+        const eok = total / 100;
         if (eok >= 10000) return (eok/10000).toFixed(1) + '조원';
         return eok.toFixed(0) + '억원';
     }
@@ -638,7 +638,7 @@
 
         // 1단계: 각 항목의 bs(건물 발판 크기) 먼저 계산
         items.forEach(item => {
-            item._bs = Math.max(6, Math.min(70, Math.log10(item.budget / 10000 + 1) * 14));
+            item._bs = Math.max(6, Math.min(70, Math.log10(item.budget / 10 + 1) * 14));
         });
 
         // 2단계: 분야별 집계 (빌딩 개수·bs² 합계 포함)
@@ -701,7 +701,7 @@
         mapData = { buildings };
 
         // 헤더 통계
-        document.getElementById('h-budget').textContent = (total/1000000000).toFixed(2);
+        document.getElementById('h-budget').textContent = (total/1000000).toFixed(2);
         document.getElementById('h-field').textContent = fieldList.length;
         document.getElementById('h-bldg').textContent = items.length.toLocaleString();
         document.getElementById('h-sub').textContent = Object.keys(Object.fromEntries(items.map(d=>[d.ministry,1]))).length;
